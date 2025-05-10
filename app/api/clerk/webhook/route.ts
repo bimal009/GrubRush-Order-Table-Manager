@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     }) as WebhookEvent
-  } catch (err) {
+  } catch (error) {
     return new Response('Error verifying webhook', {
       status: 400,
       headers: corsHeaders
@@ -107,18 +107,18 @@ export async function POST(req: Request) {
         }
 
         if (newUser._id) {
-          try {
+         
             await client.users.updateUserMetadata(id, {
               publicMetadata: {
                 userId: newUser._id
               }
             })
-          } catch (error) {}
+       
         }
 
         return NextResponse.json({ message: 'OK', user: newUser }, { headers: corsHeaders })
-      } catch (createError) {
-        return new Response(`User creation exception: ${createError.message}`, { 
+      } catch (error) {
+        return new Response(`User creation exception: ${error}`, {
           status: 500,
           headers: corsHeaders
         })
@@ -161,10 +161,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'OK', user: deletedUser }, { headers: corsHeaders })
     }
   } catch (error) {
-    return new Response(`Error processing ${eventType} event: ${error.message || 'Unknown error'}`, {
-      status: 500,
-      headers: corsHeaders
-    })
+    console.error('Error processing webhook:', error)
+   
   }
 
   return new Response('', { status: 200, headers: corsHeaders })
