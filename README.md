@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍴 GrubRush – Order & Table Manager
 
-## Getting Started
+**GrubRush** is a real-time, full-stack web application that simplifies food ordering and restaurant table management. Designed for speed, scalability, and user experience, it empowers restaurants to manage dine-in and online orders efficiently — with live updates, modern UI, and robust backend support.
 
-First, run the development server:
+---
+
+## 🚀 Tech Stack
+
+### 💻 Frontend
+- **Next.js** – React framework with SSR & routing
+- **Tailwind CSS** – Utility-first CSS
+- **React Query** – Server state & API data management
+- **Zustand** – Lightweight global/local state management
+- **WebSocket (Socket.io Client)** – Real-time client updates
+
+### 🧠 Backend
+- **Node.js + Express** – REST API for order and table management
+- **MongoDB** – NoSQL database
+- **WebSocket (Socket.io Server)** – Push-based real-time updates
+
+---
+
+## 🔧 Features
+
+- 🛒 Real-time food ordering and order tracking
+- 📋 Table reservation & availability management
+- 💬 Live updates to kitchen/staff via WebSockets
+- 🔄 Optimistic updates using Zustand + React Query
+- 👥 Role-ready: Admin, Waiter, Customer
+- 🔐 Optional Clerk/Auth plug-in compatibility
+- 🚀 Fully responsive UI built with Tailwind
+
+---
+
+## 📁 Project Structure
+
+
+---
+
+## 🛠 Installation
+
+### 1. Clone the Repo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/grubrush.git
+cd grubrush
+
+```
+## Configure Environment Variables
+```
+cp .env.example .env
+# Edit with your DB URI, API keys, etc.
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Install Dependencies
+```
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run the Application
+```
+npm run dev
+```
+ WebSocket Events
+Event Name	Description
+order:new	Sent when a new order is placed
+order:update	Used to update order status
+table:status	Updates table reservation availability
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+##🧠 State Management
+Zustand handles:
 
-## Learn More
+UI state (modals, filters, session)
 
-To learn more about Next.js, take a look at the following resources:
+Selected table/session tracking
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+React Query handles:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+API fetching (orders, menu, users)
 
-## Deploy on Vercel
+Background sync and cache management
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+##  Future Enhancements
+ Admin analytics dashboard
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+ Stripe or Razorpay integration
+
+ Notifications (email/SMS/Web)
+
+ Role-based access protection
+
+ Mobile-first PWA design
+
+## 📄 License
+MIT License © 2025 bimal pandey
+
+## Feedback & Contributions
+
+```
+
+---
+
+Let me know if you want:
+- `.env.example` template  
+- GitHub Action CI/CD setup  
+- Docker support or monorepo tooling like Turborepo  
+
+Happy building! 🍔
+```
+
