@@ -97,9 +97,6 @@ MIT License © 2025 bimal pandey
 ## Feedback & Contributions
 
 ```
-
----
-
 Let me know if you want:
 - `.env.example` template  
 - GitHub Action CI/CD setup  
