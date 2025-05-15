@@ -5,7 +5,7 @@ import { CreateUserParams } from '@/types'
 import { errorHandler } from '../utils'
 import { connectToDatabase } from '../Database/MongoDb'
 import User from '../Database/models/userModel'
-import Event from '../Database/models/eventModel'
+import Event from '../Database/models/tableModel'
 import Order from '../Database/models/orderModel'
 
 export async function createUser(user: CreateUserParams): Promise<any | null> {

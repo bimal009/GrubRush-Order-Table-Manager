@@ -30,27 +30,13 @@ export type CreateEventParams = {
   organizerId: string;
 };
 
-export type UpdateEventParams = {
-  title?: string;
-  description?: string;
-  location?: string;
-  imageUrl?: string;
-  startDateTime?: Date;
-  endDateTime?: Date;
-  price?: number;
-  isFree?: boolean;
-  url?: string;
-  categoryId?: string;
-};
-
-// Category related types
 export type CreateCategoryParams = {
   categoryName: string;
 };
 
 // Order related types
 export type CreateOrderParams = {
-  eventId: string;
+  tableId: string;
   buyerId: string;
   totalAmount: number;
   paymentStatus?: string;
@@ -62,15 +48,12 @@ export type PaginationParams = {
   limit?: number;
 };
 
-export type EventsFilterParams = PaginationParams & {
+export type foodFilterParams = PaginationParams & {
   query?: string;
   category?: string;
-  organizer?: string;
   sortBy?: 'title' | 'price' | 'startDateTime';
   sortOrder?: 'asc' | 'desc';
-  startDate?: Date;
-  endDate?: Date;
-  isFree?: boolean;
+  isAvailable?: boolean;
 };
 
 // API response types

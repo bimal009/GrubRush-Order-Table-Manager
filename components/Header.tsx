@@ -3,8 +3,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { SignedOut, SignedIn, UserButton } from '@clerk/nextjs'
 import { Button } from './ui/button'
-import Navitems from './shared/Navitems'
-import MobileNav from './shared/MobileNav'
+import Navitems from './client/shared/Navitems'
+import MobileNav from './client/shared/MobileNav'
 
 
 const Header = () => {

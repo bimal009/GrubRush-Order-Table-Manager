@@ -1,7 +1,7 @@
 "use client";
 import { useDebounce } from '@/lib/hooks/useDebounce';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { Button } from '../../ui/button';
+import { Input } from '../../ui/input';
 import { useQueryState } from 'nuqs';
 import { FormEvent } from 'react';
 

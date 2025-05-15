@@ -1,9 +1,9 @@
 "use client";
-import { useGetData } from '@/components/api/useMenu';
-import Search from '@/components/shared/Search';
+import { useGetData } from '@/components/client/api/useMenu';
+import Search from '@/components/client/shared/Search';
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
-import MenuCard from '@/components/shared/MenuCard';
+import MenuCard from '@/components/client/shared/MenuCard';
 
 
 

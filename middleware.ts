@@ -10,7 +10,13 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhook/stripe',
   '/api/uploadthing',
   "/api/clerk/webhook",
-  "/"
+  "/",
+  "/admin/dashboard",
+  "/admin/orders",
+  "/admin/menu",
+  "/admin/sales",
+  "/admin/analytics",
+  "/admin/analytics/:path*",
 ])
 
 const middleware = clerkMiddleware(async (auth, req) => {
