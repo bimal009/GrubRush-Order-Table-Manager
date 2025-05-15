@@ -17,11 +17,10 @@ const Header = () => {
                         <Image
                             src="/logo.svg"
                             alt="Buntly logo"
-                            width={32}
-                            height={32}
-                            className='h-8 w-8 object-contain'
+                            width={200}
+                            height={200}
+                            className='h-20 w-20 object-contain'
                         />
-                        <span className='text-xl font-bold'>Buntly</span>
                     </Link>
                 </div>
 

@@ -11,7 +11,6 @@ import { Separator } from "@/components/ui/separator"
 import Image from 'next/image'
 import Navitems from './Navitems'
 import Link from 'next/link'
-import { SignedIn, UserButton } from '@clerk/nextjs'
 
 const MobileNav = () => {
     return (

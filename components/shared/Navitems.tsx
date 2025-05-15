@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import React from 'react'
-import { SignedIn, UserButton } from '@clerk/nextjs'
 
 const Navigations = [
     {
@@ -8,12 +7,12 @@ const Navigations = [
         href: '/',
     },
     {
-        label: 'Create Event',
+        label: 'Order Now',
         href: '/events/create',
     },
     {
-        label: 'User Profile',
-        href: '/userprofile',
+        label: 'About Us',
+        href: '/about',
     },
 ]
 
