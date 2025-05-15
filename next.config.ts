@@ -1,3 +1,5 @@
+import { hostname } from "os";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -13,8 +15,17 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: 'res.cloudinary.com',
-      },
+      protocol: 'https',
+      hostname: 'res.cloudinary.com',
+    },
+    {
+      protocol: 'https',
+      hostname: 'ui-avatars.com',
+    },
+    {
+      protocol: 'https',
+      hostname: 'www.themealdb.com',
+    },
     ],
   },
 };
