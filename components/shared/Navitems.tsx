@@ -8,11 +8,15 @@ const Navigations = [
     },
     {
         label: 'Order Now',
-        href: '/events/create',
+        href: '/menu',
     },
     {
         label: 'About Us',
         href: '/about',
+    },
+    {
+        label: 'Contact Us',
+        href: '/contact',
     },
 ]
 

@@ -24,7 +24,7 @@ const MobileNav = () => {
                         <SheetTitle>
                             <Link href="/" className='flex items-center gap-2'>
                                 <Image className='w-8 h-8 object-contain' src="/logo.svg" alt="Buntly logo" width={32} height={32} />
-                                <p className='text-xl font-bold'>Buntly</p>
+                                <p className='text-xl font-bold'>GrubRush</p>
                             </Link>
                         </SheetTitle>
 

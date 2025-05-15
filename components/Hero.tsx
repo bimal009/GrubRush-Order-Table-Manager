@@ -27,7 +27,7 @@ const Hero = () => {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
 
                             <Button size="lg" variant="outline" className="rounded-full px-8 bg-primary text-white">
-                                <Link href="/events/create">Order Now</Link>
+                                <Link href="/menu">Order Now</Link>
                             </Button>
                         </div>
 

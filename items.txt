@@ -1,0 +1,268 @@
+ Restaurant Menu Structure
+🍗 Starters
+Hot Wings (6 pcs) – ₹199
+Spicy buffalo-style chicken wings served with blue cheese dip.
+
+Chicken Pakora – ₹179
+Deep-fried spicy chicken fritters.
+
+Paneer Tikka – ₹189
+Grilled marinated cottage cheese cubes.
+
+🍛 Mains
+🐔 Tandoori Specials
+Tandoori Chicken (Half) – ₹249
+Char-grilled chicken marinated in yogurt and spices.
+
+Chicken Tikka Masala – ₹269
+Boneless tandoori chicken cooked in creamy tomato gravy.
+
+Seekh Kebab (Mutton) – ₹299
+Minced mutton skewers cooked in a clay oven.
+
+🥘 Indian Curries
+Butter Chicken – ₹279
+Creamy tomato-based curry with boneless chicken.
+
+Palak Paneer – ₹199
+Spinach and cottage cheese in Indian spices.
+
+Rogan Josh (Mutton) – ₹299
+Rich Kashmiri mutton curry with aromatic spices.
+
+🍚 Breads & Rice
+Butter Naan – ₹49
+
+Garlic Naan – ₹59
+
+Jeera Rice – ₹99
+
+Chicken Biryani – ₹249
+
+🍹 Beverages
+🧃 Non-Alcoholic
+Fresh Lime Soda – ₹49
+
+Cold Coffee – ₹89
+
+Masala Chai – ₹39
+
+Mocktails (Assorted) – ₹129
+
+🍸 Alcoholic
+Beer (330ml) – ₹199
+
+Whiskey (60ml) – ₹249
+
+Cocktails (Mojito / LIIT / Martini) – ₹349
+
+Vodka Shots (3x30ml) – ₹399
+
+Serve alcohol only as per local laws & licensing requirements.
+
+💨 Hookah (21+ Only)
+Classic Mint – ₹299
+
+Double Apple – ₹349
+
+Grape Mint – ₹349
+
+Paan Rasna – ₹349
+
+Add Ice Base – ₹50 extra
+
+Hookah served in lounge only. IDs may be required.
+
+🛎 Notes
+All prices are inclusive of taxes.
+
+Menu items may change seasonally.
+
+Please ask staff about allergies and customizations.
+
+Would you like this as a JSON structure for your app’s backend or UI too?
+
+
+
+
+
+
+
+You said:
+make 50+ items and add other items also and dont add religions or country name
+
+
+ChatGPT said:
+Sure! Here’s a comprehensive restaurant menu with 50+ items, categorized cleanly, and free from country-specific or religious references. This is designed to be professional and app-ready for any modern restaurant or food tech platform.
+
+🧾 Full Menu
+🍽️ Starters & Appetizers
+Hot Wings (6 pcs) – ₹199
+
+Spicy Chicken Bites – ₹189
+
+Crispy Veg Fingers – ₹149
+
+Stuffed Mushrooms – ₹179
+
+Cheesy Nachos – ₹159
+
+Loaded Potato Skins – ₹169
+
+BBQ Chicken Skewers – ₹199
+
+Tempura Prawns – ₹229
+
+Spring Rolls (Veg) – ₹149
+
+Mozzarella Sticks – ₹179
+
+🔥 Grill & Tandoor
+Grilled Chicken Platter – ₹289
+
+Smoky Paneer Skewers – ₹229
+
+Spicy Lamb Chops – ₹349
+
+Roasted Veg Medley – ₹199
+
+Flame-Grilled Fish – ₹299
+
+Boneless BBQ Bites – ₹259
+
+Spicy Sausage Grill – ₹249
+
+Mixed Grill Platter (Non-Veg) – ₹399
+
+🍛 Main Course
+Buttered Gravy Chicken – ₹279
+
+Spiced Veg Curry – ₹199
+
+Slow-Cooked Mutton – ₹299
+
+Rich Tomato Cream Chicken – ₹269
+
+Sizzling Paneer Masala – ₹219
+
+Tender Meatballs in Gravy – ₹289
+
+Smoky Mushroom Bowl – ₹199
+
+🍚 Rice, Noodles & Pasta
+Classic Fried Rice (Veg/Chicken) – ₹179 / ₹219
+
+Garlic Noodles – ₹159
+
+Creamy Alfredo Pasta – ₹229
+
+Spaghetti with Meatballs – ₹259
+
+Chicken & Egg Fried Rice – ₹239
+
+Vegetable Hakka Noodles – ₹179
+
+Cheese-Stuffed Ravioli – ₹249
+
+Baked Mac & Cheese – ₹199
+
+🫓 Breads & Sides
+Butter Flatbread – ₹49
+
+Garlic Flatbread – ₹59
+
+Cheese Stuffed Bread – ₹69
+
+Mashed Potatoes – ₹89
+
+Seasoned Fries – ₹99
+
+Mixed Veg Salad – ₹99
+
+Spicy Coleslaw – ₹89
+
+🍕 Fast Bites
+Mini Chicken Burgers (2 pcs) – ₹179
+
+Veg Loaded Sandwich – ₹149
+
+Double Patty Burger – ₹229
+
+Cheese Garlic Bread – ₹129
+
+Meatball Sub – ₹249
+
+Crispy Chicken Wrap – ₹199
+
+🍹 Beverages
+Non-Alcoholic
+Fresh Lime Cooler – ₹49
+
+Cold Brew Coffee – ₹99
+
+Iced Tea (Lemon/Mint) – ₹79
+
+Sparkling Fruit Soda – ₹69
+
+Assorted Mocktails – ₹129
+
+Energy Drink – ₹99
+
+Fresh Juices (Orange/Watermelon) – ₹89
+
+Alcoholic (21+ Only)
+Lager Beer – ₹199
+
+Dark Rum (60ml) – ₹229
+
+Whiskey (60ml) – ₹249
+
+Classic Mojito – ₹349
+
+Long Island Iced Tea – ₹399
+
+Martini – ₹349
+
+Vodka Shots (3x30ml) – ₹399
+
+💨 Hookah Lounge (21+ Only)
+Mint Breeze – ₹299
+
+Grape Chill – ₹349
+
+Tropical Twist – ₹349
+
+Mixed Berry Ice – ₹369
+
+Cola Fizz – ₹329
+
+Double Apple – ₹349
+
+Add Ice Base – ₹50 extra
+
+Hookah Combo with Drinks – ₹699
+
+🍨 Desserts
+Chocolate Lava Cake – ₹149
+
+Ice Cream Sundae – ₹129
+
+Caramel Brownie – ₹159
+
+Fruit Custard – ₹109
+
+Red Velvet Slice – ₹149
+
+Cookie Skillet – ₹169
+
+Waffle with Ice Cream – ₹179
+
+✅ Notes:
+All items are served fresh & made to order.
+
+Prices are in INR and inclusive of basic taxes.
+
+IDs required for age-restricted items (alcohol & hookah).
+
+Vegan and gluten-free options available upon request.
+
