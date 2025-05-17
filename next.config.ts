@@ -8,7 +8,7 @@ const nextConfig = {
   // Only include this if your app depends on this key
   // Otherwise remove it to avoid confusion
   allowedDevOrigins: [
-    'https://buntlynp.vercel.app',
+    'https://grubrush.vercel.app',
     // "https://871c-2400-1a00-bb20-a64f-b56c-a83b-44c9-533b.ngrok-free.app",
 
   ],
