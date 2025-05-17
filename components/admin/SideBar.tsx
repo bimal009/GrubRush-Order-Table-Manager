@@ -1,57 +1,240 @@
-'use client'
 
-import React from 'react'
+// AppSidebar.jsx
+"use client";
+import { useState } from "react";
+import {
+    LayoutDashboard,
+    Settings,
+    Table,
+    User,
+    UtensilsCrossed,
+    LogOut,
+    UserCog,
+    ChevronRight,
+    ChevronDown,
+    Menu
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import {
     Sheet,
     SheetContent,
-    SheetHeader,
-    SheetTitle,
     SheetTrigger,
-} from "@/components/ui/sheet"
-import { Menu } from 'lucide-react'
-import { Separator } from "@/components/ui/separator"
-import Image from 'next/image'
-import Link from 'next/link'
-import AdminNavitems from './AdminNavItems'
+} from "@/components/ui/sheet";
 
-const SideBar = () => {
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import Link from "next/link";
+import Image from "next/image";
+import MobileSidebar from "./MobileSide";
+
+// Menu items with active state tracking
+const items = [
+    {
+        title: "Dashboard",
+        url: "/admin/dashboard",
+        icon: LayoutDashboard,
+    },
+    {
+        title: "Manage Users",
+        url: "/admin/users",
+        icon: User,
+    },
+    {
+        title: "Manage Tables",
+        url: "/admin/tables",
+        icon: Table,
+    },
+    {
+        title: "Manage Orders",
+        url: "/admin/orders",
+        icon: UtensilsCrossed,
+    },
+    {
+        title: "Settings",
+        url: "/admin/settings",
+        icon: Settings,
+    },
+];
+
+function AppSidebar() {
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [activeItem, setActiveItem] = useState("Dashboard");
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+    // Simulating current user
+    const user = {
+        name: "Admin User",
+        role: "Administrator",
+        avatar: "/api/placeholder/40/40"
+    };
+
+    const toggleCollapse = () => {
+        setIsCollapsed(!isCollapsed);
+    };
+
     return (
         <>
-            {/* Mobile Sidebar - Sheet */}
-            <div className="md:hidden">
-                <Sheet>
-                    <SheetTrigger
-                        className="flex items-center justify-center p-2 rounded-md hover:bg-accent"
-                        aria-label="Menu"
-                    >
-                        <Menu size={24} />
-                    </SheetTrigger>
-                    <SheetContent side="left" className="flex flex-col w-[250px]">
-                        <SheetHeader className="mb-6">
-                            <SheetTitle>
-                                <Link href="/" className='flex items-center gap-2'>
-                                    <Image className='w-8 h-8 object-contain' src="/logo.svg" alt="GrubRush logo" width={32} height={32} />
-                                    <p className='text-xl font-bold'>GrubRush</p>
-                                </Link>
-                            </SheetTitle>
-                        </SheetHeader>
-                        <Separator className="mb-4" />
-                        <AdminNavitems />
-                    </SheetContent>
-                </Sheet>
-            </div>
+            {/* Mobile sidebar */}
+            <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                <SheetTrigger asChild>
+                    <Button variant="outline" size="icon" className="md:hidden shadow-none outline-none border-none ">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle sidebar</span>
+                    </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-72">
+                    <MobileSidebar
+                        items={items}
+                        activeItem={activeItem}
+                        setActiveItem={setActiveItem}
+                        user={user}
+                        setIsMobileOpen={setIsMobileOpen}
+                    />
+                </SheetContent>
+            </Sheet>
 
-            {/* Desktop Sidebar */}
-            <aside className="hidden md:flex md:flex-col md:w-[250px] md:h-screen md:border-r md:py-6 md:px-4">
-                <Link href="/admin/dashboard" className='flex items-center gap-2 mb-6 px-2'>
-                    <Image className='w-8 h-8 object-contain' src="/logo.svg" alt="GrubRush logo" width={32} height={32} />
-                    <p className='text-xl font-bold'>GrubRush</p>
-                </Link>
-                <Separator className="mb-4" />
-                <AdminNavitems />
+            {/* Desktop sidebar */}
+            <aside
+                className={`hidden lg:flex flex-col h-screen sticky top-0 bg-background border-r transition-all duration-300 ${isCollapsed ? "w-16" : "w-64"
+                    }`}
+            >
+                <div className="flex items-center justify-between h-14 px-4 border-b">
+                    <div className="flex items-center">
+                        <Image
+                            className={`${isCollapsed ? "mx-auto" : "mr-3"} h-8 w-8`}
+                            src="/logo.svg"
+                            alt="Logo"
+                            height={32}
+                            width={32}
+                        />
+
+                    </div>
+
+                    <Button
+                        onClick={toggleCollapse}
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                    >
+                        {isCollapsed ? (
+                            <ChevronRight className="h-4 w-4" />
+                        ) : (
+                            <ChevronDown className="h-4 w-4" />
+                        )}
+                    </Button>
+                </div>
+
+                <ScrollArea className="flex-1 py-2">
+                    <div className="space-y-1 px-2">
+                        <div className="pb-2">
+                            {!isCollapsed && (
+                                <h2 className="text-xs font-semibold text-muted-foreground px-2 py-1">
+                                    Application
+                                </h2>
+                            )}
+                            <nav className="space-y-1">
+                                {items.map((item) => (
+                                    <TooltipProvider key={item.title} delayDuration={0}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    asChild
+                                                    variant={activeItem === item.title ? "secondary" : "ghost"}
+                                                    className={`w-full justify-start ${isCollapsed ? "px-2" : "px-2"}`}
+                                                    onClick={() => setActiveItem(item.title)}
+                                                >
+                                                    <Link href={item.url} className="flex items-center">
+                                                        <item.icon className={`${isCollapsed ? "mx-auto" : "mr-2"} h-4 w-4`} />
+                                                        {!isCollapsed && (
+                                                            <span>{item.title}</span>
+                                                        )}
+                                                    </Link>
+                                                </Button>
+                                            </TooltipTrigger>
+                                            {isCollapsed && (
+                                                <TooltipContent side="right">
+                                                    {item.title}
+                                                </TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                ))}
+                            </nav>
+                        </div>
+                    </div>
+                </ScrollArea>
+
+                <div className="mt-auto p-2 border-t">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                className={`w-full justify-start ${isCollapsed ? "px-2" : "px-2"}`}
+                            >
+                                <div className="flex items-center">
+                                    <Avatar className={`${isCollapsed ? "mx-auto" : "mr-2"} h-6 w-6`}>
+                                        <AvatarImage src={user.avatar} alt={user.name} />
+                                        <AvatarFallback>AU</AvatarFallback>
+                                    </Avatar>
+                                    {!isCollapsed && (
+                                        <div className="text-left">
+                                            <p className="text-sm font-medium truncate">{user.name}</p>
+                                            <p className="text-xs text-muted-foreground truncate">{user.role}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56">
+                            <div className="px-2 py-1.5">
+                                <p className="text-sm font-medium">{user.name}</p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                    {user.role}
+                                </p>
+                            </div>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin/profile" className="flex items-center cursor-pointer">
+                                    <UserCog className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin/settings" className="flex items-center cursor-pointer">
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    <span>Settings</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild className="text-destructive focus:text-destructive">
+                                <Link href="/admin/logout" className="flex items-center cursor-pointer">
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Logout</span>
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </aside>
         </>
-    )
+    );
 }
 
-export default SideBar
+export default AppSidebar;

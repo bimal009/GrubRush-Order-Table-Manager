@@ -9,6 +9,8 @@ export interface IEvent extends Document {
 const tableSchema = new Schema({
   title: { type: String, required: true },
   isAvailable: { type: Boolean, default: false },
+  isReserved: { type: Boolean, default: false },
+  isPaid: { type: Boolean, default: false },
 })
 
 const Table = models.Table || model('Table', tableSchema);

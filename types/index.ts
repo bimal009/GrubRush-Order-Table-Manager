@@ -67,3 +67,13 @@ export type ApiResponse<T> = {
 
 // Custom utility types
 export type Maybe<T> = T | null | undefined;
+
+
+export type CardProps = {
+  title: string;
+  content:string;
+  value: string | number;
+  icon: React.ReactNode;
+  secondaryValue?: string | number;
+};
+

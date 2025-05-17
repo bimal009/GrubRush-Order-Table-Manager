@@ -6,7 +6,7 @@ import { useQueryState } from 'nuqs';
 import { FormEvent } from 'react';
 
 const Search = () => {
-    const [searchQuery, setSearchQuery] = useQueryState('search');
+    const [searchQuery, setSearchQuery] = useQueryState('search',);
     const debouncedSearchQuery = useDebounce(searchQuery || '', 500);
 
     const handleSubmit = (e: FormEvent) => {

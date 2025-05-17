@@ -121,8 +121,6 @@
   }
 }
 
-
-
 /* Global CSS to hide Clerk development mode indicators everywhere */
 
 /* Target the development mode text specifically */
@@ -153,6 +151,4 @@ div[class*="cl-footer"] {
   opacity: 1 !important;
   visibility: visible !important;
 }
-
-
 

@@ -7,6 +7,7 @@ import { connectToDatabase } from '../Database/MongoDb'
 import User from '../Database/models/userModel'
 import Event from '../Database/models/tableModel'
 import Order from '../Database/models/orderModel'
+import { UserManagement } from '@/components/admin/UsersData/columns'
 
 export async function createUser(user: CreateUserParams): Promise<any | null> {
   try {
@@ -93,5 +94,25 @@ export async function deleteUser(clerkId: string) {
   } catch (error) {
     errorHandler(error)
     return null
+  }
+}
+
+
+export async function getUsers(): Promise<UserManagement[]> {
+  try {
+    await connectToDatabase()
+
+    // Find all users, exclude password field
+    const users = await User.find({}, { password: 0 })
+    // Return only required fields
+    return users.map(user => ({
+      username: user.username,
+      email: user.email,
+      clerkId: user.clerkId,
+    }))
+
+  } catch (error) {
+    errorHandler(error)
+    return []
   }
 }
