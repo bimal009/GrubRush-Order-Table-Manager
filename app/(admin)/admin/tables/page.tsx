@@ -5,24 +5,20 @@ import { Table2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 
-export const payments: TableManagement[] = [
+const tables: TableManagement[] = [
     {
+        tableNo: 1,
+        isAvailable: true,
+        tableStatus: "available",
         orderStatus: "pending",
-        tableNumber: "T01",
-        numberOfSeats: 2,
-        area: "Area 2",
-        bookedBy: "John Doe",
-        bookingReason: "Birthday Party",
-        status: "available",
+        amount: 0
     },
     {
+        tableNo: 2,
+        isAvailable: true,
+        tableStatus: "available",
         orderStatus: "processing",
-        tableNumber: "T02",
-        numberOfSeats: 4,
-        area: "Area 1",
-        bookedBy: "John Doe",
-        bookingReason: "Birthday Party",
-        status: "available",
+        amount: 0
     },
 ]
 
@@ -48,7 +44,7 @@ const page = () => {
                 </div>
                 {/* Table Section */}
                 <div className="rounded-2xl border bg-card shadow-lg p-0 sm:p-2 w-full overflow-x-visible">
-                    <DataTable type="table" columns={columns} data={payments} />
+                    <DataTable type="table" columns={columns} data={tables} />
                 </div>
             </div>
         </div>

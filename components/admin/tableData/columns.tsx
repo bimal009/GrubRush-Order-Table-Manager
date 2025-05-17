@@ -19,13 +19,12 @@ import { Badge } from "@/components/ui/badge"
 type TableStatus = "available" | "reserved" | "occupied" | "unavailable"
 
 export type TableManagement = {
-    tableNumber: string
-    numberOfSeats: number
-    area: string
-    status: TableStatus
+    _id?: string
+    tableNo: number
+    isAvailable: boolean
+    tableStatus: TableStatus
     orderStatus: "pending" | "processing" | "completed" | "cancelled"
-    bookedBy?: string
-    bookingReason?: string
+    amount: number
 }
 
 export const columns: ColumnDef<TableManagement>[] = [
@@ -54,7 +53,7 @@ export const columns: ColumnDef<TableManagement>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "tableNumber",
+        accessorKey: "tableNo",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -65,45 +64,13 @@ export const columns: ColumnDef<TableManagement>[] = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="font-medium">T-{row.getValue("tableNumber")}</div>,
+        cell: ({ row }) => <div className="font-medium">T-{row.getValue("tableNo")}</div>,
     },
     {
-        accessorKey: "area",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                className="-ml-4"
-            >
-                Area
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => <Badge variant="outline">{row.getValue("area")}</Badge>,
-    },
-    {
-        accessorKey: "numberOfSeats",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                className="-ml-4"
-            >
-                Seats
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => (
-            <div className="text-center font-medium w-20">
-                {row.getValue("numberOfSeats")}
-            </div>
-        ),
-    },
-    {
-        accessorKey: "status",
+        accessorKey: "tableStatus",
         header: "Status",
         cell: ({ row }) => {
-            const status = row.getValue("status") as TableStatus
+            const status = row.getValue("tableStatus") as TableStatus
 
             const colorMap: Record<TableStatus, string> = {
                 available: "green",
