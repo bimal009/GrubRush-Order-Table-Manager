@@ -78,7 +78,7 @@ export const columns: ColumnDef<UserManagement>[] = [
     {
         id: "actions",
         cell: ({ row }) => {
-            const { mutate: deleteUser, isPending } = useDeleteUser(row.original.clerkId)
+            const { mutate: deleteUser } = useDeleteUser(row.original.clerkId)
             const handleDelete = async (clerkId: string) => {
                 try {
                     deleteUser(clerkId)

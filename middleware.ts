@@ -1,6 +1,13 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
+// Define the structure of session claims
+interface SessionClaims {
+  metadata?: {
+    role?: string;
+  };
+}
+
 // Public routes accessible without login
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -18,7 +25,6 @@ const isAdminRoute = createRouteMatcher(['/admin(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
   const authObj = await auth();
-
   const url = new URL(req.url);
 
   // Allow public routes without auth
@@ -28,16 +34,18 @@ export default clerkMiddleware(async (auth, req) => {
 
   // Protect admin routes with admin role
   if (isAdminRoute(req)) {
-    const role = authObj.sessionClaims?.metadata?.role;
+    const claims = authObj.sessionClaims as SessionClaims;
+    const role = claims.metadata?.role;
+
     if (role !== 'admin') {
       return NextResponse.redirect(new URL('/', req.url));
     }
+
     return NextResponse.next();
   }
 
   // For other routes (non-public, non-admin) require authentication
   if (!authObj.userId) {
-    // redirect to sign-in if not authenticated
     return NextResponse.redirect(new URL('/sign-in', req.url));
   }
 
