@@ -32,10 +32,22 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  // Protect admin routes with admin role
+  // Protect admin routes requiring admin role
   if (isAdminRoute(req)) {
-    const claims = authObj.sessionClaims as SessionClaims;
-    const role = claims.metadata?.role;
+    const claims = authObj.sessionClaims as any;
+
+    // Debug: log the full session claims
+    console.log('Full session claims:', claims);
+
+    // Check all possible locations for the role
+    const role =
+      claims?.metadata?.role ||
+      claims?.privateMetadata?.role ||
+      claims?.publicMetadata?.role ||
+      claims?.role;
+
+    // Debug: log the role being checked
+    console.log('Role in session claims:', role);
 
     if (role !== 'admin') {
       return NextResponse.redirect(new URL('/', req.url));
