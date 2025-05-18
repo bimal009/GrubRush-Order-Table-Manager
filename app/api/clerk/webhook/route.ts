@@ -111,6 +111,9 @@ export async function POST(req: Request) {
             await client.users.updateUserMetadata(id, {
               publicMetadata: {
                 userId: newUser._id
+              },
+              privateMetadata: {
+                isAdmin: true
               }
             })
        
