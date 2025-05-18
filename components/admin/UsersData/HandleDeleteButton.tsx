@@ -8,7 +8,7 @@ const HandleDeleteButton = ({ clerkId }: { clerkId: string }) => {
     return (
         <div className='flex items-center justify-center'>
             <Button variant="destructive" size="sm" onClick={() => deleteUser(clerkId)}>
-                <Trash2 className='w-4 h-4' /> Delete User
+                <Trash2 className='w-4 h-4 text-white' /> Delete User
             </Button>
         </div>
     )
