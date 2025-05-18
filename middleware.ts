@@ -1,13 +1,11 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-
-// Define the structure of session claims
-interface SessionClaims {
-  metadata?: {
+import { jwtDecode } from 'jwt-decode';
+interface RoleJWT {
+  publicMetadata?: {
     role?: string;
   };
 }
-
 // Public routes accessible without login
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -25,35 +23,31 @@ const isAdminRoute = createRouteMatcher(['/admin(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
   const authObj = await auth();
-  const url = new URL(req.url);
 
   // Allow public routes without auth
   if (isPublicRoute(req)) {
     return NextResponse.next();
   }
 
-  // Protect admin routes requiring admin role
+  // Protect admin routes with admin role
   if (isAdminRoute(req)) {
-    const claims = authObj.sessionClaims as any;
+    const token = await authObj.getToken({ template: 'with-role' });
 
-    // Debug: log the full session claims
-    console.log('Full session claims:', claims);
+    if (token) {
+      const decoded = jwtDecode<RoleJWT>(token);
+      const role = decoded?.publicMetadata?.role;
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Decoded JWT:', decoded);
+      }
+      console.log('Role from JWT:', role);
 
-    // Check all possible locations for the role
-    const role =
-      claims?.metadata?.role ||
-      claims?.privateMetadata?.role ||
-      claims?.publicMetadata?.role ||
-      claims?.role;
-
-    // Debug: log the role being checked
-    console.log('Role in session claims:', role);
-
-    if (role !== 'admin') {
-      return NextResponse.redirect(new URL('/', req.url));
+      if (role === 'admin') {
+        return NextResponse.next();
+      }
     }
 
-    return NextResponse.next();
+    // No token or not an admin — redirect
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
   // For other routes (non-public, non-admin) require authentication
