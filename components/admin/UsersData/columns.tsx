@@ -14,7 +14,7 @@ import {
 import { ArrowUpDown } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { useDeleteUser } from "../api/useGetUsers"
+import { useDeleteUser } from "../api/useUsers"
 
 export type UserManagement = {
     username: string

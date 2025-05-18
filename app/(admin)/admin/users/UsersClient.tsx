@@ -4,7 +4,7 @@ import React from "react"
 import { columns } from "@/components/admin/UsersData/columns"
 import DataTable from "@/components/admin/tableData/DataTable"
 import { Loader2, User } from "lucide-react"
-import { useGetUsers } from "@/components/admin/api/useGetUsers"
+import { useGetUsers } from "@/components/admin/api/useUsers"
 
 const UsersClient = () => {
     const { data: users, isLoading } = useGetUsers()

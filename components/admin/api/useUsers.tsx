@@ -10,8 +10,8 @@ export const useGetUsers = () => {
 }
 
 
-export const useDeleteUser = (clerkId: string) => {
-    return useMutation<UserManagement, Error>({
-        mutationFn: () => deleteUser(clerkId),
+export const useDeleteUser = () => {
+    return useMutation<UserManagement, Error, string>({
+        mutationFn: (clerkId: string) => deleteUser(clerkId),
     })
 }
