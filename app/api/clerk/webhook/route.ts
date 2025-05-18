@@ -112,9 +112,6 @@ export async function POST(req: Request) {
               publicMetadata: {
                 userId: newUser._id
               },
-              privateMetadata: {
-                isAdmin: true
-              }
             })
        
         }
