@@ -1,26 +1,68 @@
 import { columns } from '@/components/admin/tableData/columns'
-import { TableManagement } from '@/components/admin/tableData/columns'
 import DataTable from '@/components/admin/tableData/DataTable'
 import { Table2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import React from 'react'
+import { HotelTable } from '@/components/admin/tableData/columns'
 
-const tables: TableManagement[] = [
+export const hotelTableData: HotelTable[] = [
     {
-        tableNo: 1,
+        _id: "1",
+        tableNumber: 1,
+        capacity: 4,
+        location: "indoor",
         isAvailable: true,
-        tableStatus: "available",
-        orderStatus: "pending",
-        amount: 0
+        isReserved: false,
+        isPaid: true,
+        status: "completed",
+        estimatedServeTime: "2025-05-18T19:30:00Z",
     },
     {
-        tableNo: 2,
-        isAvailable: true,
-        tableStatus: "available",
-        orderStatus: "processing",
-        amount: 0
+        _id: "2",
+        tableNumber: 2,
+        capacity: 2,
+        location: "outdoor",
+        isAvailable: false,
+        isReserved: true,
+        isPaid: false,
+        status: "processing",
+        estimatedServeTime: "2025-05-18T20:00:00Z",
     },
-]
+    {
+        _id: "3",
+        tableNumber: 3,
+        capacity: 6,
+        location: "indoor",
+        isAvailable: true,
+        isReserved: false,
+        isPaid: false,
+        status: "idle",
+        estimatedServeTime: null,
+    },
+    {
+        _id: "4",
+        tableNumber: 4,
+        capacity: 8,
+        location: "outdoor",
+        isAvailable: false,
+        isReserved: true,
+        isPaid: true,
+        status: "completed",
+        estimatedServeTime: "2025-05-18T21:15:00Z",
+    },
+    {
+        _id: "5",
+        tableNumber: 5,
+        capacity: 2,
+        location: "indoor",
+        isAvailable: true,
+        isReserved: false,
+        isPaid: true,
+        status: "processing",
+        estimatedServeTime: "2025-05-18T20:45:00Z",
+    },
+];
+
 
 const page = () => {
     return (
@@ -44,7 +86,7 @@ const page = () => {
                 </div>
                 {/* Table Section */}
                 <div className="rounded-2xl border bg-card shadow-lg p-0 sm:p-2 w-full overflow-x-visible">
-                    <DataTable type="table" columns={columns} data={tables} />
+                    <DataTable type="table" columns={columns} data={hotelTableData} />
                 </div>
             </div>
         </div>

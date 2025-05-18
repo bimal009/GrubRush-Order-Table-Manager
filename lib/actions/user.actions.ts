@@ -6,10 +6,11 @@ import { errorHandler } from '../utils'
 import { connectToDatabase } from '../Database/MongoDb'
 import User from '../Database/models/userModel'
 import Order from '../Database/models/orderModel'
-import { UserManagement } from '@/components/admin/UsersData/columns'
-import Table from '../Database/models/tableModel'
+import HotelTable from '../Database/models/tableModel'
+import { Users } from '@/components/admin/UsersData/columns'
+import { clerkClient } from '@clerk/clerk-sdk-node'
 
-export async function createUser(user: CreateUserParams): Promise<any | null> {
+export async function createUser(user: CreateUserParams): Promise<User | null> {
   try {
     await connectToDatabase()
 
@@ -70,12 +71,15 @@ export async function deleteUser(clerkId: string) {
   try {
     await connectToDatabase()
 
+    // Delete user from Clerk
+    await clerkClient.users.deleteUser(clerkId)
+
     const userToDelete = await User.findOne({ clerkId })
     if (!userToDelete) throw new Error('User not found')
 
     try {
       await Promise.all([
-        Table.updateMany(
+        HotelTable.updateMany(
           { _id: { $in: userToDelete.events || [] } },
           { $pull: { organizer: userToDelete._id } }
         ),
@@ -90,6 +94,11 @@ export async function deleteUser(clerkId: string) {
 
     const deletedUser = await User.findByIdAndDelete(userToDelete._id)
     revalidatePath('/')
+    if (deletedUser) {
+      console.log('Deleted user:', deletedUser)
+    } else {
+      console.log('No user to delete')
+    }
     return deletedUser ? JSON.parse(JSON.stringify(deletedUser)) : null
   } catch (error) {
     errorHandler(error)
@@ -97,8 +106,7 @@ export async function deleteUser(clerkId: string) {
   }
 }
 
-
-export async function getUsers(): Promise<UserManagement[]> {
+export async function getUsers(): Promise<Users[]> {
   try {
     await connectToDatabase()
 
@@ -109,6 +117,9 @@ export async function getUsers(): Promise<UserManagement[]> {
       username: user.username,
       email: user.email,
       clerkId: user.clerkId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      photo: user.photo,
     }))
 
   } catch (error) {

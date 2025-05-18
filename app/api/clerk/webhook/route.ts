@@ -1,6 +1,7 @@
 import { Webhook } from 'svix'
 import { headers } from 'next/headers'
-import { clerkClient, WebhookEvent } from '@clerk/nextjs/server'
+import { clerkClient } from '@clerk/clerk-sdk-node'
+import type { WebhookEvent } from '@clerk/nextjs/server'
 import { createUser, updateUser, deleteUser } from '@/lib/actions/user.actions'
 import { NextResponse } from 'next/server'
 
@@ -18,7 +19,6 @@ export async function POST(req: Request) {
     })
   }
 
-  const client = await clerkClient()
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SIGNING_SECRET
 
   if (!WEBHOOK_SECRET) {
@@ -107,15 +107,14 @@ export async function POST(req: Request) {
         }
 
         if (newUser._id) {
-         
-            await client.users.updateUserMetadata(id, {
+            await clerkClient.users.updateUserMetadata(id, {
               publicMetadata: {
                 userId: newUser._id
               },
             })
-       
         }
 
+        console.log('User created:', newUser)
         return NextResponse.json({ message: 'OK', user: newUser }, { headers: corsHeaders })
       } catch (error) {
         return new Response(`User creation exception: ${error}`, {
@@ -158,6 +157,7 @@ export async function POST(req: Request) {
         })
       }
 
+      console.log('User deleted:', deletedUser)
       return NextResponse.json({ message: 'OK', user: deletedUser }, { headers: corsHeaders })
     }
   } catch (error) {

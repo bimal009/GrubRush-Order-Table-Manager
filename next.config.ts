@@ -25,6 +25,14 @@ const nextConfig = {
       protocol: 'https',
       hostname: 'www.themealdb.com',
     },
+    {
+      protocol: 'https',
+      hostname: 'avatars.githubusercontent.com',
+    },
+    {
+      protocol: 'https',
+      hostname: 'img.clerk.com',
+    },
     ],
   },
 };

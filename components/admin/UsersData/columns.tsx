@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { CheckCircle2, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -16,13 +16,15 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import HandleDeleteButton from "./HandleDeleteButton"
 
-export type UserManagement = {
+export type Users = {
     username: string
     email: string
     clerkId: string
+    firstName?: string
+    lastName?: string
 }
 
-export const columns: ColumnDef<UserManagement>[] = [
+export const columns: ColumnDef<Users>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -62,6 +64,34 @@ export const columns: ColumnDef<UserManagement>[] = [
         cell: ({ row }) => <div className="font-medium">{row.getValue("username")}</div>,
     },
     {
+        accessorKey: "firstName",
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                className="-ml-4"
+            >
+                First Name
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => <div className="font-medium">{row.getValue("firstName")}</div>,
+    },
+    {
+        accessorKey: "lastName",
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                className="-ml-4"
+            >
+                Last Name
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => <div className="font-medium">{row.getValue("lastName")}</div>,
+    },
+    {
         accessorKey: "email",
         header: ({ column }) => (
             <Button
@@ -78,7 +108,6 @@ export const columns: ColumnDef<UserManagement>[] = [
     {
         id: "actions",
         cell: ({ row }) => {
-
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -91,18 +120,8 @@ export const columns: ColumnDef<UserManagement>[] = [
                         <DropdownMenuLabel className="text-xs">User Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() => {
-                                console.log("Edit User:", row.original.clerkId)
-                            }}
-                            className="text-sm cursor-pointer"
-                        >
-                            <CheckCircle2 className="mr-2 h-4 w-4" />
-                            Edit User
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-
-                            className="text-sm cursor-pointer text-red-600 focus:text-red-700"
+                            className="p-0 hover:bg-transparent"
+                            onSelect={(e) => e.preventDefault()}
                         >
                             <HandleDeleteButton clerkId={row.original.clerkId} />
                         </DropdownMenuItem>

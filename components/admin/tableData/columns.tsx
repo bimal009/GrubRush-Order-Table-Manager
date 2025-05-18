@@ -1,7 +1,13 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { CheckCircle2, CircleSlash, Clock, MoreHorizontal } from "lucide-react"
+import {
+    MoreHorizontal,
+    CircleSlash,
+    Clock,
+    CheckCircle2,
+    Loader2,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -15,19 +21,19 @@ import { ArrowUpDown } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 
-
-type TableStatus = "available" | "reserved" | "occupied" | "unavailable"
-
-export type TableManagement = {
+export type HotelTable = {
     _id?: string
-    tableNo: number
+    tableNumber: number
+    capacity: number
+    location: "indoor" | "outdoor"
     isAvailable: boolean
-    tableStatus: TableStatus
-    orderStatus: "pending" | "processing" | "completed" | "cancelled"
-    amount: number
+    isReserved: boolean
+    isPaid: boolean
+    status: "idle" | "processing" | "completed"
+    estimatedServeTime?: string | null // ISO string
 }
 
-export const columns: ColumnDef<TableManagement>[] = [
+export const columns: ColumnDef<HotelTable>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -53,61 +59,113 @@ export const columns: ColumnDef<TableManagement>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "tableNo",
+        accessorKey: "tableNumber",
         header: ({ column }) => (
             <Button
                 variant="ghost"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 className="-ml-4"
             >
-                Table Number
+                Table No.
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="font-medium">T-{row.getValue("tableNo")}</div>,
+        cell: ({ row }) => <div className="font-medium">T-{row.getValue("tableNumber")}</div>,
     },
     {
-        accessorKey: "tableStatus",
-        header: "Status",
+        accessorKey: "capacity",
+        header: "Capacity",
+        cell: ({ row }) => <div>{row.getValue("capacity")} people</div>,
+    },
+    {
+        accessorKey: "location",
+        header: "Location",
         cell: ({ row }) => {
-            const status = row.getValue("tableStatus") as TableStatus
-
-            const colorMap: Record<TableStatus, string> = {
-                available: "green",
-                reserved: "yellow",
-                occupied: "blue",
-                unavailable: "destructive",
-            }
-
+            const loc = row.getValue("location")
             return (
-                <Badge variant={colorMap[status] as "green" | "yellow" | "blue" | "destructive"}>
-                    <span className="capitalize">{status}</span>
+                <Badge variant="secondary" className="capitalize">
+                    {loc}
                 </Badge>
             )
         },
     },
     {
-        accessorKey: "orderStatus",
-        header: "Order",
+        accessorKey: "isAvailable",
+        header: "Available",
         cell: ({ row }) => {
-            const status = row.getValue("orderStatus") as string
-            const variant = {
-                pending: "yellow",
+            const isAvailable = row.getValue("isAvailable")
+            return isAvailable ? (
+                <Badge variant="green">Yes</Badge>
+            ) : (
+                <Badge variant="destructive">No</Badge>
+            )
+        },
+    },
+    {
+        accessorKey: "isReserved",
+        header: "Reserved",
+        cell: ({ row }) => {
+            const reserved = row.getValue("isReserved")
+            return reserved ? (
+                <Badge variant="yellow">Yes</Badge>
+            ) : (
+                <Badge variant="secondary">No</Badge>
+            )
+        },
+    },
+    {
+        accessorKey: "isPaid",
+        header: "Paid",
+        cell: ({ row }) => {
+            const paid = row.getValue("isPaid")
+            return paid ? (
+                <Badge variant="green">Yes</Badge>
+            ) : (
+                <Badge variant="default">No</Badge>
+            )
+        },
+    },
+    {
+        accessorKey: "status",
+        header: "Order Status",
+        cell: ({ row }) => {
+            const status = row.getValue("status") as HotelTable["status"];
+            const colorMap = {
+                idle: "default",
                 processing: "blue",
                 completed: "green",
-                cancelled: "destructive",
-            }[status]
+            };
+            const iconMap = {
+                idle: <Clock className="inline mr-1 w-4 h-4" />,
+                processing: <Loader2 className="inline mr-1 w-4 h-4 animate-spin" />,
+                completed: <CheckCircle2 className="inline mr-1 w-4 h-4" />,
+            };
 
             return (
-                <Badge variant={variant as "green" | "blue" | "yellow" | "destructive" | "default"}>
-                    <span className="capitalize">{status}</span>
+                <Badge variant={colorMap[status] as any} className="capitalize flex items-center">
+                    {iconMap[status]}
+                    {status}
                 </Badge>
+            );
+        },
+    },
+    {
+        accessorKey: "estimatedServeTime",
+        header: "ETA",
+        cell: ({ row }) => {
+            const eta = row.getValue("estimatedServeTime") as string | null
+            if (!eta) return <span className="text-muted-foreground">N/A</span>
+
+            const date = new Date(eta)
+            return (
+                <span>{date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
             )
         },
     },
     {
         id: "actions",
-        cell: () => {
+        cell: ({ row }) => {
+            const id = row.original._id
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

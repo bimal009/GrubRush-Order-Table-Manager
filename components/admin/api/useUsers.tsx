@@ -1,19 +1,19 @@
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query"
+// useUsers.ts
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { getUsers, deleteUser } from "@/lib/actions/user.actions"
-import { UserManagement } from "@/components/admin/UsersData/columns"
+import { Users } from "@/components/admin/UsersData/columns"
 
 export const useGetUsers = () => {
-    return useQuery<UserManagement[], Error>({
+    return useQuery<Users[], Error>({
         queryKey: ["users"],
-        queryFn: () => getUsers(),
+        queryFn: getUsers,
     })
 }
 
-
-export const useDeleteUser = (clerkId: string) => {
-    const queryClient = new QueryClient()
-    return useMutation<UserManagement, Error, string>({
-        mutationFn: () => deleteUser(clerkId),
+export const useDeleteUser = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (clerkId: string) => deleteUser(clerkId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users"] })
         },
