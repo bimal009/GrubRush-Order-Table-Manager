@@ -1,30 +1,24 @@
-import { Schema, model, models, Document } from 'mongoose'
+import { Schema, model, models, Document, Types } from 'mongoose';
 
 export interface IOrder extends Document {
-  createdAt: Date
-  stripeId: string
-  totalAmount: string
-  event: {
-    _id: string
-    title: string
-  }
-  buyer: {
-    _id: string
-    firstName: string
-    lastName: string
-  }
+  createdAt: Date;
+  stripeId: string;
+  totalAmount: string;
+  table: Types.ObjectId; // Ref to HotelTable
+  buyer: Types.ObjectId; // Ref to User
 }
 
+// This is for client-side listing (if needed)
 export type IOrderItem = {
-  _id: string
-  totalAmount: string
-  createdAt: Date
-  eventTitle: string
-  eventId: string
-  buyer: string
-}
+  _id: string;
+  totalAmount: string;
+  createdAt: Date;
+  tableTitle: string;
+  tableId: string;
+  buyer: string;
+};
 
-const OrderSchema = new Schema({
+const OrderSchema = new Schema<IOrder>({
   createdAt: {
     type: Date,
     default: Date.now,
@@ -37,16 +31,18 @@ const OrderSchema = new Schema({
   totalAmount: {
     type: String,
   },
-  event: {
+  table: {
     type: Schema.Types.ObjectId,
-    ref: 'Event',
+    ref: 'HotelTable',
+    required: true,
   },
   buyer: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+    required: true,
   },
-})
+});
 
-const Order = models.Order || model('Order', OrderSchema)
+const Order = models.Order || model<IOrder>('Order', OrderSchema);
 
-export default Order
+export default Order;

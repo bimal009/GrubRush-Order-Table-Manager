@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { CheckCircle2, CircleSlash, MoreHorizontal } from "lucide-react"
+import { CheckCircle2, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -14,7 +14,7 @@ import {
 import { ArrowUpDown } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { useDeleteUser } from "../api/useUsers"
+import HandleDeleteButton from "./HandleDeleteButton"
 
 export type UserManagement = {
     username: string
@@ -78,16 +78,6 @@ export const columns: ColumnDef<UserManagement>[] = [
     {
         id: "actions",
         cell: ({ row }) => {
-            const { mutate: deleteUser } = useDeleteUser(row.original.clerkId)
-            const handleDelete = async (clerkId: string) => {
-                try {
-                    deleteUser(clerkId)
-                    // Optional: add success toast, refetch table, etc.
-                    console.log(`User with clerkId ${clerkId} deleted`)
-                } catch (error) {
-                    console.error("Failed to delete user:", error)
-                }
-            }
 
             return (
                 <DropdownMenu>
@@ -111,11 +101,10 @@ export const columns: ColumnDef<UserManagement>[] = [
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() => handleDelete(row.original.clerkId)}
+
                             className="text-sm cursor-pointer text-red-600 focus:text-red-700"
                         >
-                            <CircleSlash className="mr-2 h-4 w-4" />
-                            Delete User
+                            <HandleDeleteButton clerkId={row.original.clerkId} />
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
