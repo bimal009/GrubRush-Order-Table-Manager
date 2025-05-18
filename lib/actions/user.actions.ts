@@ -5,9 +5,9 @@ import { CreateUserParams } from '@/types'
 import { errorHandler } from '../utils'
 import { connectToDatabase } from '../Database/MongoDb'
 import User from '../Database/models/userModel'
-import Event from '../Database/models/tableModel'
 import Order from '../Database/models/orderModel'
 import { UserManagement } from '@/components/admin/UsersData/columns'
+import Table from '../Database/models/tableModel'
 
 export async function createUser(user: CreateUserParams): Promise<any | null> {
   try {
@@ -75,7 +75,7 @@ export async function deleteUser(clerkId: string) {
 
     try {
       await Promise.all([
-        Event.updateMany(
+        Table.updateMany(
           { _id: { $in: userToDelete.events || [] } },
           { $pull: { organizer: userToDelete._id } }
         ),

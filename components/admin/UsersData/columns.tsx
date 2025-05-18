@@ -14,7 +14,7 @@ import {
 import { ArrowUpDown } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { deleteUser } from "@/lib/actions/user.actions"
+import { useDeleteUser } from "../api/useGetUsers"
 
 export type UserManagement = {
     username: string
@@ -78,9 +78,10 @@ export const columns: ColumnDef<UserManagement>[] = [
     {
         id: "actions",
         cell: ({ row }) => {
+            const { mutate: deleteUser, isPending } = useDeleteUser(row.original.clerkId)
             const handleDelete = async (clerkId: string) => {
                 try {
-                    await deleteUser(clerkId)
+                    deleteUser(clerkId)
                     // Optional: add success toast, refetch table, etc.
                     console.log(`User with clerkId ${clerkId} deleted`)
                 } catch (error) {

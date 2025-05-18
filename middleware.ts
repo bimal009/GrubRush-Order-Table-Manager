@@ -13,6 +13,7 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/admin/dashboard",
   "/admin/orders",
+  "/admin/users",
   "/admin/menu",
   "/admin/sales",
   "/admin/analytics",
