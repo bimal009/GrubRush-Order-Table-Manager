@@ -48,3 +48,20 @@ export function getStatusColor(status: string): string {
       return "bg-gray-100 text-gray-800 border-gray-300";
   }
 }
+
+
+export function handleError(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return "An unknown error occurred.";
+  }
+}

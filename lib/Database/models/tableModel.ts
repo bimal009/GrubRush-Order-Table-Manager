@@ -1,4 +1,5 @@
-import { Document, Schema, model, models, Types } from "mongoose";
+import { Schema, model, models, Document, Types } from 'mongoose';
+import { IOrder } from './orderModel';
 
 export interface IHotelTable extends Document {
   tableNumber: number;
@@ -7,27 +8,46 @@ export interface IHotelTable extends Document {
   isAvailable: boolean;
   isReserved: boolean;
   isPaid: boolean;
-  status: 'idle' | 'processing' | 'completed'; // NEW FIELD
-  currentOrder?: Types.ObjectId;
-  estimatedServeTime?: Date; // NEW FIELD
-  reservedBy?: Types.ObjectId;
+  status: 'idle' | 'processing' | 'completed';
+  currentOrder?: Types.ObjectId | IOrder | null;
+  reservedBy?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+  } | null;
 }
 
-const hotelTableSchema = new Schema<IHotelTable>({
-  tableNumber: { type: Number, required: true, unique: true },
-  capacity: { type: Number, required: true },
-  location: { type: String, enum: ['indoor', 'outdoor'], default: 'indoor' },
-  isAvailable: { type: Boolean, default: true },
-  isReserved: { type: Boolean, default: false },
-  isPaid: { type: Boolean, default: false },
+const HotelTableSchema = new Schema<IHotelTable>(
+  {
+    tableNumber: { type: Number, required: true },
+    capacity: { type: Number, required: true },
+    location: { type: String, enum: ['indoor', 'outdoor'], required: true },
+    isAvailable: { type: Boolean, required: true },
+    isReserved: { type: Boolean, required: true },
+    isPaid: { type: Boolean, required: true },
+    status: { type: String, enum: ['idle', 'processing', 'completed'], required: true },
+    currentOrder: {
+      type: Schema.Types.ObjectId,
+      ref: 'Order',
+      default: null,
+    },
+    reservedBy: {
+      type: Schema.Types.Mixed,
+      default: null,
+      required: false
+    }
+  },
+  { timestamps: true }
+);
 
-  status: { type: String, enum: ['idle', 'processing', 'completed'], default: 'idle' }, // NEW
-  estimatedServeTime: { type: Date, default: null }, // NEW
+// Pre-save middleware to handle empty reservedBy
+HotelTableSchema.pre('save', function(next) {
+  if (this.reservedBy && !this.reservedBy.name) {
+    this.reservedBy = null;
+  }
+  next();
+});
 
-  reservedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
-  currentOrder: { type: Schema.Types.ObjectId, ref: 'Order', default: null },
-}, { timestamps: true });
-
-const HotelTable = models.HotelTable || model<IHotelTable>('HotelTable', hotelTableSchema);
+const HotelTable = models.HotelTable || model<IHotelTable>('HotelTable', HotelTableSchema);
 
 export default HotelTable;

@@ -15,26 +15,12 @@ export type UpdateUserParams = {
   photo?: string;
 };
 
-// Event related types
-export type CreateEventParams = {
-  title: string;
-  description?: string;
-  location?: string;
-  imageUrl?: string;
-  startDate: Date;
-  endDate: Date;
-  price?: number;
-  isFree?: boolean;
-  url?: string;
-  categoryId?: string;
-  organizerId: string;
-};
+
 
 export type CreateCategoryParams = {
   categoryName: string;
 };
 
-// Order related types
 export type CreateOrderParams = {
   tableId: string;
   buyerId: string;
@@ -42,7 +28,6 @@ export type CreateOrderParams = {
   paymentStatus?: string;
 };
 
-// Pagination and filtering types
 export type PaginationParams = {
   page?: number;
   limit?: number;
@@ -56,7 +41,6 @@ export type foodFilterParams = PaginationParams & {
   isAvailable?: boolean;
 };
 
-// API response types
 export type ApiResponse<T> = {
   success: boolean;
   data?: T;

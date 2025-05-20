@@ -9,6 +9,8 @@ import Order from '../Database/models/orderModel'
 import HotelTable from '../Database/models/tableModel'
 import { Users } from '@/components/admin/UsersData/columns'
 import { clerkClient } from '@clerk/clerk-sdk-node'
+import { handleError } from "../utils"
+import { Types } from "mongoose"
 
 export async function createUser(user: CreateUserParams): Promise<User | null> {
   try {
@@ -127,3 +129,35 @@ export async function getUsers(): Promise<Users[]> {
     return []
   }
 }
+
+export interface UserData {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+interface UserDocument {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export const getUsersTable = async (): Promise<UserData[]> => {
+  try {
+    await connectToDatabase();
+    const users = await User.find()
+      .select('_id name email phone')
+      .lean() as UserDocument[];
+
+    return users.map(user => ({
+      _id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      phone: user.phone
+    }));
+  } catch (error) {
+    throw new Error(handleError(error));
+  }
+};

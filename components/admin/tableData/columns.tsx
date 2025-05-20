@@ -3,7 +3,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import {
     MoreHorizontal,
-    CircleSlash,
     Clock,
     CheckCircle2,
     Loader2,
@@ -18,8 +17,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ArrowUpDown } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
+import DeleteTable from "./_components/DeleteTable"
 
 export type HotelTable = {
     _id?: string
@@ -30,34 +29,15 @@ export type HotelTable = {
     isReserved: boolean
     isPaid: boolean
     status: "idle" | "processing" | "completed"
-    estimatedServeTime?: string | null // ISO string
+    estimatedServeTime: string | null
+    reservedBy: {
+        name?: string;
+        email?: string;
+        phone?: string;
+    } | null
 }
 
 export const columns: ColumnDef<HotelTable>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-                className="translate-y-[2px]"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-                className="translate-y-[2px]"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
     {
         accessorKey: "tableNumber",
         header: ({ column }) => (
@@ -70,7 +50,7 @@ export const columns: ColumnDef<HotelTable>[] = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="font-medium">T-{row.getValue("tableNumber")}</div>,
+        cell: ({ row }) => <div className="font-medium ml-2">T-{row.getValue("tableNumber")}</div>,
     },
     {
         accessorKey: "capacity",
@@ -81,7 +61,7 @@ export const columns: ColumnDef<HotelTable>[] = [
         accessorKey: "location",
         header: "Location",
         cell: ({ row }) => {
-            const loc = row.getValue("location")
+            const loc = row.getValue("location") as "indoor" | "outdoor"
             return (
                 <Badge variant="secondary" className="capitalize">
                     {loc}
@@ -114,6 +94,18 @@ export const columns: ColumnDef<HotelTable>[] = [
         },
     },
     {
+        accessorKey: "reservedBy",
+        header: "Reserved By",
+        cell: ({ row }) => {
+            const reservedBy = row.getValue("reservedBy") as HotelTable["reservedBy"]
+            return (
+                <div className="font-medium ml-2">
+                    {reservedBy?.name || "Not Reserved"}
+                </div>
+            )
+        },
+    },
+    {
         accessorKey: "isPaid",
         header: "Paid",
         cell: ({ row }) => {
@@ -130,7 +122,7 @@ export const columns: ColumnDef<HotelTable>[] = [
         header: "Order Status",
         cell: ({ row }) => {
             const status = row.getValue("status") as HotelTable["status"];
-            const colorMap = {
+            const colorMap: Record<HotelTable["status"], "default" | "blue" | "green"> = {
                 idle: "default",
                 processing: "blue",
                 completed: "green",
@@ -142,7 +134,7 @@ export const columns: ColumnDef<HotelTable>[] = [
             };
 
             return (
-                <Badge variant={colorMap[status] as any} className="capitalize flex items-center">
+                <Badge variant={colorMap[status]} className="capitalize flex items-center">
                     {iconMap[status]}
                     {status}
                 </Badge>
@@ -153,45 +145,57 @@ export const columns: ColumnDef<HotelTable>[] = [
         accessorKey: "estimatedServeTime",
         header: "ETA",
         cell: ({ row }) => {
-            const eta = row.getValue("estimatedServeTime") as string | null
-            if (!eta) return <span className="text-muted-foreground">N/A</span>
+            const eta = row.getValue("estimatedServeTime") as string | null;
 
-            const date = new Date(eta)
+            if (!eta) {
+                return <span className="text-muted-foreground">N/A</span>;
+            }
+
+            const date = new Date(eta);
+            const isValid = !isNaN(date.getTime());
+
             return (
-                <span>{date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-            )
+                <span>
+                    {isValid
+                        ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                        : <span className="text-muted-foreground">Invalid Date</span>}
+                </span>
+            );
         },
     },
     {
         id: "actions",
         cell: ({ row }) => {
-            const id = row.original._id
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuLabel className="text-xs">Table Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-sm cursor-pointer">
-                            <Clock className="mr-2 h-4 w-4" />
-                            View Orders
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-sm cursor-pointer">
-                            <CheckCircle2 className="mr-2 h-4 w-4" />
-                            Mark Available
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-sm cursor-pointer text-red-600 focus:text-red-700">
-                            <CircleSlash className="mr-2 h-4 w-4" />
-                            Delete Table
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="relative">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel className="text-xs">Table Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-sm cursor-pointer">
+                                <Clock className="mr-2 h-4 w-4" />
+                                View Orders
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-sm cursor-pointer">
+                                <CheckCircle2 className="mr-2 h-4 w-4" />
+                                Mark Available
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                className="text-sm cursor-pointer text-red-600 focus:text-red-700"
+                                onSelect={(e) => e.preventDefault()}
+                            >
+                                {row.original._id && <DeleteTable tableId={row.original._id.toString()} />}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             )
         },
     },

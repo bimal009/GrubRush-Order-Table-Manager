@@ -6,9 +6,10 @@ export interface IOrder extends Document {
   totalAmount: string;
   table: Types.ObjectId; // Ref to HotelTable
   buyer: Types.ObjectId; // Ref to User
+  estimatedServeTime?: Date | null; // Add if you want ETA here
 }
 
-// This is for client-side listing (if needed)
+// Optional client-side type
 export type IOrderItem = {
   _id: string;
   totalAmount: string;
@@ -41,6 +42,10 @@ const OrderSchema = new Schema<IOrder>({
     ref: 'User',
     required: true,
   },
+  estimatedServeTime: {
+    type: Date,
+    default: null,
+  }
 });
 
 const Order = models.Order || model<IOrder>('Order', OrderSchema);

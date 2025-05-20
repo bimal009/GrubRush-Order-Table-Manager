@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Trash2 } from "lucide-react"
-import { useDeleteUser } from "../api/useUsers"
-import AlertBox from "../AlertBox"
+import { useDeleteUser } from "../../api/useUsers"
+import AlertBox from "../../AlertBox"
 import { toast } from "sonner"
 
 const HandleDeleteButton = ({ clerkId }: { clerkId: string }) => {
