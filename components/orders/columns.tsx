@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import DeleteTable from "./_components/DeleteTable"
 
 export type HotelTable = {
     _id?: string

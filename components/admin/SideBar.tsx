@@ -12,7 +12,9 @@ import {
     UserCog,
     ChevronRight,
     ChevronDown,
-    Menu
+    Menu,
+    Calendar,
+    Hamburger
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -65,6 +67,16 @@ const items = [
         title: "Manage Orders",
         url: "/admin/orders",
         icon: UtensilsCrossed,
+    },
+    {
+        title: "Manage Menu",
+        url: "/admin/menu",
+        icon: Hamburger,
+    },
+    {
+        title: "Reservations",
+        url: "/admin/reservations",
+        icon: Calendar,
     },
     {
         title: "Settings",

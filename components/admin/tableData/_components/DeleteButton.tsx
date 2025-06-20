@@ -7,7 +7,7 @@ import AlertBox from "../../AlertBox"
 import { toast } from "sonner"
 import { useDeleteTable } from "../../api/useTable"
 
-const DeleteTable = ({ tableId }: { tableId: string }) => {
+const DeleteButton = ({ tableId }: { tableId: string }) => {
     const [open, setOpen] = useState(false)
     const { mutate, isPending } = useDeleteTable()
 
@@ -51,4 +51,4 @@ const DeleteTable = ({ tableId }: { tableId: string }) => {
     )
 }
 
-export default DeleteTable
+export default DeleteButton

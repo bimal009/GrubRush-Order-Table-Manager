@@ -2,11 +2,11 @@ import { Schema, model, models, Document, Types } from 'mongoose';
 
 export interface IOrder extends Document {
   createdAt: Date;
-  stripeId: string;
   totalAmount: string;
   table: Types.ObjectId; // Ref to HotelTable
   buyer: Types.ObjectId; // Ref to User
-  estimatedServeTime?: Date | null; // Add if you want ETA here
+  estimatedServeTime?: number | null; // Add if you want ETA here
+  quantity: number;
 }
 
 // Optional client-side type
@@ -17,17 +17,14 @@ export type IOrderItem = {
   tableTitle: string;
   tableId: string;
   buyer: string;
+  estimatedServeTime?: number | null;
+  quantity: number;
 };
 
 const OrderSchema = new Schema<IOrder>({
   createdAt: {
     type: Date,
     default: Date.now,
-  },
-  stripeId: {
-    type: String,
-    required: true,
-    unique: true,
   },
   totalAmount: {
     type: String,
@@ -43,9 +40,14 @@ const OrderSchema = new Schema<IOrder>({
     required: true,
   },
   estimatedServeTime: {
-    type: Date,
+    type: Number,
     default: null,
-  }
+  },
+  quantity: {
+    type: Number,
+    default: 0,
+  },
+
 });
 
 const Order = models.Order || model<IOrder>('Order', OrderSchema);

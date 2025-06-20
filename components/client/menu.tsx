@@ -15,11 +15,11 @@ import { useQueryState } from 'nuqs';
 import { useGetMenu } from '@/components/admin/api/useMenu';
 import { MenuItem } from '@/types';
 
-const MenuPage = () => {
+const Menu = () => {
     const searchParams = useSearchParams();
     const query = searchParams.get('search') || '';
     const { data, isLoading, error } = useGetMenu(query);
-    console.log(data)
+    console.log("menu data",data)
     // Pagination state from URL with fallback for SSR
     const [currentPageState, setCurrentPage] = useQueryState('page', {
         defaultValue: '1',
@@ -106,9 +106,9 @@ const MenuPage = () => {
     };
 
     return (
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-8 h-screen">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-6 text-center">Our Menu</h1>
+                <h1 className="text-3xl font-bold mb-6 text-center text-primary">Our Menu</h1>
                 <Search />
             </div>
 
@@ -214,4 +214,4 @@ const MenuPage = () => {
     );
 };
 
-export default MenuPage;
+export default Menu;

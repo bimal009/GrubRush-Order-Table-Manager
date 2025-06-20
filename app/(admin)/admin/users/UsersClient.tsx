@@ -11,9 +11,9 @@ const UsersClient = () => {
     return (
         <div className="min-h-[calc(100vh-4rem)] w-full bg-muted/50 py-8">
             {isLoading ? (
-                <div className="fixed inset-0 flex justify-center items-center bg-background/80 backdrop-blur-sm">
-                    <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
-                </div>
+                    <div className="fixed inset-0 flex justify-center items-center bg-background/80 backdrop-blur-sm">
+                        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+                    </div>
             ) : (
                 <div className="w-full px-2 sm:px-6">
                     {/* Header */}
@@ -30,9 +30,7 @@ const UsersClient = () => {
                     </div>
 
                     {/* Table Section */}
-                    <div className="rounded-2xl border bg-card shadow-lg p-0 sm:p-2 w-full overflow-x-visible">
-                        <DataTable columns={columns} data={users || []} type="user" />
-                    </div>
+                    <DataTable columns={columns} data={users || []} type="user" />
                 </div>
             )}
         </div>

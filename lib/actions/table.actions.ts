@@ -17,8 +17,9 @@ const serializeTable = (table: TableWithOrder): SerializedHotelTable => ({
     status: table.status,
     estimatedServeTime: table.currentOrder?.estimatedServeTime?.toISOString() || null,
     reservedBy: table.reservedBy ? {
-        type: table.reservedBy.type,
-        value: table.reservedBy.value
+        name: table.reservedBy.name,
+        email: table.reservedBy.email,
+        phone: table.reservedBy.phone
     } : null,
     createdAt: table.createdAt?.toISOString(),
     updatedAt: table.updatedAt?.toISOString(),
@@ -62,3 +63,32 @@ export const deleteTable = async (tableId: string): Promise<SerializedHotelTable
         throw new Error(handleError(error));
     }
 };
+
+
+export const markAvailable = async (tableId: string): Promise<SerializedHotelTable> => {
+    try {
+        await connectToDatabase();
+        if (!tableId) throw new Error("Table ID is required");
+
+        const table = await HotelTable.findByIdAndUpdate(tableId, { isAvailable: true, reservedBy: null, isReserved: false, isPaid: false, status: "idle" }, { new: true }).lean() as unknown as TableWithOrder;
+        if (!table) throw new Error("Table not found");
+
+        return serializeTable(table);   
+    } catch (error) {
+        throw new Error(handleError(error));
+    }
+}
+
+export const markUnavailable = async (tableId: string): Promise<SerializedHotelTable> => {
+    try {
+        await connectToDatabase();
+        if (!tableId) throw new Error("Table ID is required");
+
+        const table = await HotelTable.findByIdAndUpdate(tableId, { isAvailable: false, reservedBy: null, isReserved: true, isPaid: false, status: "idle" }, { new: true }).lean() as unknown as TableWithOrder;
+        if (!table) throw new Error("Table not found");
+
+        return serializeTable(table);   
+    } catch (error) {
+        throw new Error(handleError(error));
+    }
+}

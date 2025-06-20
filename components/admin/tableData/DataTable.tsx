@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button"
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
-    type: "table" | "user"
+    type: "table" | "user" | "menu" | "reservations" | "orders"
 }
 
 const DataTable = <TData, TValue>({
@@ -57,9 +57,42 @@ const DataTable = <TData, TValue>({
         }
     })
 
-    // Determine filter column based on `type`
-    const filterColumn = type === "user" ? "username" : "tableNumber"
-    const filterPlaceholder = type === "user" ? "Search username..." : "Search table number..."
+    const getFilterConfig = (type: string) => {
+        switch (type) {
+            case "user":
+                return {
+                    column: "username",
+                    placeholder: "Search username..."
+                }
+            case "table":
+                return {
+                    column: "tableNumber",
+                    placeholder: "Search table number..."
+                }
+            case "menu":
+                return {
+                    column: "name",
+                    placeholder: "Search menu item..."
+                }
+            case "reservations":
+                return {
+                    column: "guestInfo.name",
+                    placeholder: "Search guest name..."
+                }
+            case "orders":
+                return {
+                    column: "orderId",
+                    placeholder: "Search order ID..."
+                }
+            default:
+                return {
+                    column: "name",
+                    placeholder: "Search..."
+                }
+        }
+    }
+
+    const filterConfig = getFilterConfig(type)
 
     return (
         <div className="w-full">
@@ -68,10 +101,10 @@ const DataTable = <TData, TValue>({
                 <div className="relative w-full max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder={filterPlaceholder}
-                        value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
+                        placeholder={filterConfig.placeholder}
+                        value={(table.getColumn(filterConfig.column)?.getFilterValue() as string) ?? ""}
                         onChange={(event) =>
-                            table.getColumn(filterColumn)?.setFilterValue(event.target.value)
+                            table.getColumn(filterConfig.column)?.setFilterValue(event.target.value)
                         }
                         className="pl-8"
                     />

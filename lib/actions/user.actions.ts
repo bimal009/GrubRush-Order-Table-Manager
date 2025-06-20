@@ -12,7 +12,7 @@ import { clerkClient } from '@clerk/clerk-sdk-node'
 import { handleError } from "../utils"
 import { Types } from "mongoose"
 
-export async function createUser(user: CreateUserParams): Promise<User | null> {
+export async function createUser(user: CreateUserParams): Promise<any | null> {
   try {
     await connectToDatabase()
 
@@ -132,32 +132,46 @@ export async function getUsers(): Promise<Users[]> {
 
 export interface UserData {
   _id: string;
-  name: string;
+  username: string;
   email: string;
-  phone: string;
+  firstName: string;
+  lastName: string;
 }
 
 interface UserDocument {
   _id: Types.ObjectId;
-  name: string;
+  username: string;
   email: string;
-  phone: string;
+  firstName: string;
+  lastName: string;
 }
 
 export const getUsersTable = async (): Promise<UserData[]> => {
   try {
     await connectToDatabase();
     const users = await User.find()
-      .select('_id name email phone')
-      .lean() as UserDocument[];
+      .select('_id username email firstName lastName')
+      .lean() as unknown as UserDocument[];
 
     return users.map(user => ({
       _id: user._id.toString(),
-      name: user.name,
+      username: user.username,
       email: user.email,
-      phone: user.phone
+      firstName: user.firstName,
+      lastName: user.lastName
     }));
   } catch (error) {
     throw new Error(handleError(error));
   }
 };
+
+export async function getUserByClerkId(clerkId: string) {
+  try {
+    await connectToDatabase()
+    const user = await User.findOne({ clerkId })
+    return user ? user.toObject() : null
+  } catch (error) {
+    errorHandler(error)
+    return null
+  }
+}

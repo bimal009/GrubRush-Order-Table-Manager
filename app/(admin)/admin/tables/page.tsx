@@ -1,11 +1,10 @@
 "use client"
-import { columns } from '@/components/admin/tableData/columns'
+import { columns } from '@/components/admin/tableData/_components/columns'
 import DataTable from '@/components/admin/tableData/DataTable'
 import { Table2 } from 'lucide-react'
 import React from 'react'
 import AddTableButton from './_components/AddTableButton'
 import { useGetTables } from '@/components/admin/api/useTable'
-
 
 
 

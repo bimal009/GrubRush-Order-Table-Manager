@@ -1,7 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createTable, getTable, deleteTable } from "@/lib/actions/table.actions"
+import { createTable, getTable, deleteTable, markAvailable, markUnavailable } from "@/lib/actions/table.actions"
 import { CreateTableParams, SerializedHotelTable } from "@/types/tables"
 
 export const useGetTables = () => {
@@ -32,3 +32,28 @@ export const useDeleteTable = () => {
         },
     })
 }
+
+
+export const useMarkAvailable = () => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (tableId: string) => markAvailable(tableId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["tables"] })
+        },
+    })
+}
+
+export const useMarkUnavailable = () => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (tableId: string) => markUnavailable(tableId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["tables"] })
+        },
+    })
+}
+
+
