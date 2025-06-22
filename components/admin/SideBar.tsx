@@ -1,4 +1,3 @@
-
 // AppSidebar.jsx
 "use client";
 import { useState } from "react";
@@ -45,6 +44,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import Image from "next/image";
 import MobileSidebar from "./MobileSide";
+import { usePathname } from "next/navigation";
 
 // Menu items with active state tracking
 const items = [
@@ -87,8 +87,8 @@ const items = [
 
 function AppSidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [activeItem, setActiveItem] = useState("Dashboard");
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const pathname = usePathname();
 
     // Simulating current user
     const user = {
@@ -101,12 +101,17 @@ function AppSidebar() {
         setIsCollapsed(!isCollapsed);
     };
 
+    // Helper function to check if a menu item is active
+    const isActiveItem = (itemUrl) => {
+        return pathname === itemUrl || pathname.startsWith(itemUrl + '/');
+    };
+
     return (
         <>
             {/* Mobile sidebar */}
             <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="outline" size="icon" className="md:hidden shadow-none outline-none border-none ">
+                    <Button variant="outline" size="icon" className="md:hidden shadow-none outline-none border-none">
                         <Menu className="h-5 w-5" />
                         <span className="sr-only">Toggle sidebar</span>
                     </Button>
@@ -114,8 +119,7 @@ function AppSidebar() {
                 <SheetContent side="left" className="p-0 w-72">
                     <MobileSidebar
                         items={items}
-                        activeItem={activeItem}
-                        setActiveItem={setActiveItem}
+                        pathname={pathname}
                         user={user}
                         setIsMobileOpen={setIsMobileOpen}
                     />
@@ -124,8 +128,9 @@ function AppSidebar() {
 
             {/* Desktop sidebar */}
             <aside
-                className={`hidden lg:flex flex-col h-screen sticky top-0 bg-background border-r transition-all duration-300 ${isCollapsed ? "w-16" : "w-64"
-                    }`}
+                className={`hidden lg:flex flex-col h-screen sticky top-0 bg-background border-r transition-all duration-300 ${
+                    isCollapsed ? "w-16" : "w-64"
+                }`}
             >
                 <div className="flex items-center justify-between h-14 px-4 border-b">
                     <div className="flex items-center">
@@ -136,7 +141,9 @@ function AppSidebar() {
                             height={32}
                             width={32}
                         />
-
+                        {!isCollapsed && (
+                            <span className="font-semibold text-lg">Admin Panel</span>
+                        )}
                     </div>
 
                     <Button
@@ -158,7 +165,7 @@ function AppSidebar() {
                         <div className="pb-2">
                             {!isCollapsed && (
                                 <h2 className="text-xs font-semibold text-muted-foreground px-2 py-1">
-                                    Application
+                                    MENU
                                 </h2>
                             )}
                             <nav className="space-y-1">
@@ -168,20 +175,23 @@ function AppSidebar() {
                                             <TooltipTrigger asChild>
                                                 <Button
                                                     asChild
-                                                    variant={activeItem === item.title ? "secondary" : "ghost"}
-                                                    className={`w-full justify-start ${isCollapsed ? "px-2" : "px-2"}`}
-                                                    onClick={() => setActiveItem(item.title)}
+                                                    variant={isActiveItem(item.url) ? "default" : "ghost"}
+                                                    className={`w-full justify-start ${isCollapsed ? "px-2" : "px-2"} ${
+                                                        isActiveItem(item.url) 
+                                                            ? "bg-primary text-primary-foreground" 
+                                                            : "hover:bg-accent hover:text-accent-foreground"
+                                                    }`}
                                                 >
-                                                    <Link href={item.url} className="flex items-center">
-                                                        <item.icon className={`${isCollapsed ? "mx-auto" : "mr-2"} h-4 w-4`} />
+                                                    <Link href={item.url} className="flex items-center w-full">
+                                                        <item.icon className={`${isCollapsed ? "mx-auto" : "mr-2"} h-4 w-4 shrink-0`} />
                                                         {!isCollapsed && (
-                                                            <span>{item.title}</span>
+                                                            <span className="truncate">{item.title}</span>
                                                         )}
                                                     </Link>
                                                 </Button>
                                             </TooltipTrigger>
                                             {isCollapsed && (
-                                                <TooltipContent side="right">
+                                                <TooltipContent side="right" sideOffset={10}>
                                                     {item.title}
                                                 </TooltipContent>
                                             )}
@@ -198,15 +208,15 @@ function AppSidebar() {
                         <DropdownMenuTrigger asChild>
                             <Button
                                 variant="ghost"
-                                className={`w-full justify-start ${isCollapsed ? "px-2" : "px-2"}`}
+                                className={`w-full justify-start ${isCollapsed ? "px-2" : "px-2"} hover:bg-accent`}
                             >
-                                <div className="flex items-center">
-                                    <Avatar className={`${isCollapsed ? "mx-auto" : "mr-2"} h-6 w-6`}>
+                                <div className="flex items-center w-full">
+                                    <Avatar className={`${isCollapsed ? "mx-auto" : "mr-2"} h-6 w-6 shrink-0`}>
                                         <AvatarImage src={user.avatar} alt={user.name} />
                                         <AvatarFallback>AU</AvatarFallback>
                                     </Avatar>
                                     {!isCollapsed && (
-                                        <div className="text-left">
+                                        <div className="text-left min-w-0 flex-1">
                                             <p className="text-sm font-medium truncate">{user.name}</p>
                                             <p className="text-xs text-muted-foreground truncate">{user.role}</p>
                                         </div>

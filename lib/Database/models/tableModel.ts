@@ -8,8 +8,8 @@ export interface IHotelTable extends Document {
   isAvailable: boolean;
   isReserved: boolean;
   isPaid: boolean;
-  status: 'idle' | 'processing' | 'completed';
-  currentOrder?: Types.ObjectId | IOrder | null;
+  status: 'pending' | 'preparing' | 'served' | 'cancelled';
+  currentOrders: Types.ObjectId[] | IOrder[] | null;
   reservedBy?: {
     name?: string;
     email?: string;
@@ -24,30 +24,28 @@ const HotelTableSchema = new Schema<IHotelTable>(
     location: { type: String, enum: ['indoor', 'outdoor'], required: true },
     isAvailable: { type: Boolean, required: true },
     isReserved: { type: Boolean, required: true },
-    isPaid: { type: Boolean, required: true },
-    status: { type: String, enum: ['idle', 'processing', 'completed'], required: true },
-    currentOrder: {
+    isPaid: { type: Boolean, required: true, default: false },
+    status: { type: String, enum: ['pending', 'preparing', 'served', 'cancelled'], required: true },
+    currentOrders: [{
       type: Schema.Types.ObjectId,
       ref: 'Order',
-      default: null,
-    },
+      default: [],
+    }],
     reservedBy: {
       type: Schema.Types.Mixed,
       default: null,
       required: false
-    }
+    },
+    
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    ...({ strictPopulate: false } as any)
+  }
 );
 
-// Pre-save middleware to handle empty reservedBy
-HotelTableSchema.pre('save', function(next) {
-  if (this.reservedBy && !this.reservedBy.name) {
-    this.reservedBy = null;
-  }
-  next();
-});
 
-const HotelTable = models.HotelTable || model<IHotelTable>('HotelTable', HotelTableSchema);
+
+const HotelTable = models.HotelTable || model("HotelTable", HotelTableSchema);
 
 export default HotelTable;

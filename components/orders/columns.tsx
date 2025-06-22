@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import DeleteButton from "@/components/admin/tableData/_components/DeleteButton"
 
 export type HotelTable = {
     _id?: string
@@ -27,7 +28,7 @@ export type HotelTable = {
     isAvailable: boolean
     isReserved: boolean
     isPaid: boolean
-    status: "idle" | "processing" | "completed"
+    status: 'pending' | 'preparing' | 'served' | 'cancelled';
     estimatedServeTime: string | null
     reservedBy: {
         name?: string;
@@ -121,15 +122,17 @@ export const columns: ColumnDef<HotelTable>[] = [
         header: "Order Status",
         cell: ({ row }) => {
             const status = row.getValue("status") as HotelTable["status"];
-            const colorMap: Record<HotelTable["status"], "default" | "blue" | "green"> = {
-                idle: "default",
-                processing: "blue",
-                completed: "green",
+            const colorMap: Record<HotelTable["status"], "default" | "blue" | "green" | "destructive"> = {
+                pending: "default",
+                preparing: "blue",
+                served: "green",
+                cancelled: "destructive",
             };
             const iconMap = {
-                idle: <Clock className="inline mr-1 w-4 h-4" />,
-                processing: <Loader2 className="inline mr-1 w-4 h-4 animate-spin" />,
-                completed: <CheckCircle2 className="inline mr-1 w-4 h-4" />,
+                pending: <Clock className="inline mr-1 w-4 h-4" />,
+                preparing: <Loader2 className="inline mr-1 w-4 h-4 animate-spin" />,
+                served: <CheckCircle2 className="inline mr-1 w-4 h-4" />,
+                cancelled: <Clock className="inline mr-1 w-4 h-4" />,
             };
 
             return (
@@ -190,7 +193,7 @@ export const columns: ColumnDef<HotelTable>[] = [
                                 className="text-sm cursor-pointer text-red-600 focus:text-red-700"
                                 onSelect={(e) => e.preventDefault()}
                             >
-                                {row.original._id && <DeleteTable tableId={row.original._id.toString()} />}
+                                {row.original._id && <DeleteButton tableId={row.original._id.toString()} />}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

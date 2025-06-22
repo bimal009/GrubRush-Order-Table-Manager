@@ -31,7 +31,7 @@ const formSchema = z.object({
     isAvailable: z.boolean(),
     isReserved: z.boolean(),
     isPaid: z.boolean(),
-    status: z.enum(["idle", "processing", "completed"]),
+    status: z.enum(['pending', 'preparing', 'served', 'cancelled']),
 })
 
 type FormSchema = z.infer<typeof formSchema>
@@ -53,7 +53,7 @@ export function CreateTableForm({ onSuccess }: CreateTableFormProps) {
             isAvailable: false,
             isReserved: false,
             isPaid: false,
-            status: "idle",
+            status: "pending",
         },
     })
 
@@ -151,9 +151,10 @@ export function CreateTableForm({ onSuccess }: CreateTableFormProps) {
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    <SelectItem value="idle">Idle</SelectItem>
-                                    <SelectItem value="processing">Processing</SelectItem>
-                                    <SelectItem value="completed">Completed</SelectItem>
+                                    <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="preparing">Preparing</SelectItem>
+                                    <SelectItem value="served">Served</SelectItem>
+                                    <SelectItem value="cancelled">Cancelled</SelectItem>
                                 </SelectContent>
                             </Select>
                             <FormMessage />

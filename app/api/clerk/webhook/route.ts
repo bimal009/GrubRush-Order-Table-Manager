@@ -114,7 +114,6 @@ export async function POST(req: Request) {
             })
         }
 
-        console.log('User created:', newUser)
         return NextResponse.json({ message: 'OK', user: newUser }, { headers: corsHeaders })
       } catch (error) {
         return new Response(`User creation exception: ${error}`, {
@@ -157,7 +156,6 @@ export async function POST(req: Request) {
         })
       }
 
-      console.log('User deleted:', deletedUser)
       return NextResponse.json({ message: 'OK', user: deletedUser }, { headers: corsHeaders })
     }
   } catch (error) {

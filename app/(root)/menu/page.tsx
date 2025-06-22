@@ -19,7 +19,6 @@ const MenuPage = () => {
     const searchParams = useSearchParams();
     const query = searchParams.get('search') || '';
     const { data, isLoading, error } = useGetMenu(query);
-    console.log(data)
     // Pagination state from URL with fallback for SSR
     const [currentPageState, setCurrentPage] = useQueryState('page', {
         defaultValue: '1',

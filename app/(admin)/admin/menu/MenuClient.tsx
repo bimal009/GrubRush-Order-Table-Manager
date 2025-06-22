@@ -11,14 +11,19 @@ import { toast } from "sonner"
 const MenuClient = () => {
     
     const { data: menu, isLoading } = useGetMenu()
-    console.log(menu)
-    return (
-        <div className="min-h-[calc(100vh-4rem)] w-full bg-muted/50 py-8">
-            {isLoading ? (
+    
+    if (isLoading) {
+        return (
+            <div className="min-h-[calc(100vh-4rem)] w-full bg-muted/50 py-8">
                 <div className="fixed inset-0 flex justify-center items-center bg-background/80 backdrop-blur-sm">
                     <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
                 </div>
-            ) : (
+            </div>
+        )
+    }
+    return (
+        <div className="min-h-[calc(100vh-4rem)] w-full bg-muted/50 py-8">
+            
                 <div className="w-full px-2 sm:px-6">
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -41,7 +46,6 @@ const MenuClient = () => {
                         <DataTable columns={columns} data={menu || []} type="menu" />
                     </div>
                 </div>
-            )}
         </div>
     )
 }

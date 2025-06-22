@@ -1,11 +1,15 @@
 import React from 'react';
-import { Clock, DollarSign, Users, Utensils } from 'lucide-react';
+import { Clock, DollarSign, Loader2, Users, Utensils } from 'lucide-react';
 import AlertsCard from '@/components/admin/Alerts';
 import SalesChart from '@/components/admin/Barchart';
 import DetailsCard from '@/components/admin/Card';
 import UpcomingReservations from '@/components/admin/UpcomingReservations';
+import { useGetTables } from '@/components/admin/api/useTable';
+import { useGetOrders } from '@/components/client/api/useOrder';
 
 const Dashboard = () => {
+   
+
     return (
         <div className="min-h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] p-6 flex flex-col gap-6 bg-background overflow-hidden">
             {/* Header Section */}

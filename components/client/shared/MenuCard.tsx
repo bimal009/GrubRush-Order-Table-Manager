@@ -16,11 +16,11 @@ const MenuCard = ({ item, type }: MenuCardProps) => {
     if (type === "menu") {
         const meal = item as MenuItem;
         const addItem = useOrderStore((state) => state.addItem);
-        console.log("Meal data:", meal);
         const debouncedAddItem = useDebounce(()=>{
             console.log("Adding item with preparationTime:", meal.preparationTime);
+            console.log("Meal data:", debouncedAddItem);
             const itemToAdd = {
-                id: meal._id,
+                menuItem: meal._id,
                 name: meal.name,
                 price: meal.price,
                 quantity: 1,
@@ -61,7 +61,7 @@ const MenuCard = ({ item, type }: MenuCardProps) => {
     if (type === "table") {
         const table = item as SerializedHotelTable;
         return (
-            <Link href={`/tables/${table._id}`}>
+            <Link href={`/select-tables/${table._id}`}>
                 <div className="border rounded-lg shadow-md overflow-hidden flex flex-col mb-6 hover:shadow-lg transition-shadow duration-300 p-4">
                     <div className="flex justify-between items-center mb-2">
                         <h2 className="text-xl font-bold truncate">Table {table.tableNumber}</h2>

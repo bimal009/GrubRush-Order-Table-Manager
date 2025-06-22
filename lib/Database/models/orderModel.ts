@@ -7,6 +7,16 @@ export interface IOrder extends Document {
   buyer: Types.ObjectId; // Ref to User
   estimatedServeTime?: number | null; // Add if you want ETA here
   quantity: number;
+  status: 'pending' | 'preparing' | 'served' | 'cancelled';
+  isPaid: boolean;
+  orderItems: Array<{
+    menuItem: Types.ObjectId; // Reference to MenuItem
+    name: string;
+    price: number;
+    quantity: number;
+    specialInstructions?: string;
+    estimatedServeTime?: number;
+  }>;
 }
 
 // Optional client-side type
@@ -47,9 +57,52 @@ const OrderSchema = new Schema<IOrder>({
     type: Number,
     default: 0,
   },
-
+  status: {
+    type: String,
+    enum: ['pending', 'preparing', 'served', 'cancelled'],
+    default: 'pending',
+    required: true,
+  },
+  isPaid: {
+    type: Boolean,
+    default: false,
+  },
+  orderItems: [{
+    menuItem: {
+      type: Schema.Types.ObjectId,
+      ref: 'MenuItem',
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+    specialInstructions: {
+      type: String,
+      default: "",
+    },
+    estimatedServeTime: {
+      type: Number,
+      default: null,
+    },
+    
+  }],
 });
 
-const Order = models.Order || model<IOrder>('Order', OrderSchema);
+// Force model recompilation by deleting existing model
+if (models.Order) {
+  delete models.Order;
+}
+
+const Order = model<IOrder>('Order', OrderSchema);
 
 export default Order;

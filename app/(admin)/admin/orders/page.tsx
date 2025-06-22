@@ -1,11 +1,10 @@
 import React from 'react'
+import OrdersClient from './OrdersClient'
 
 const page = () => {
-    return (
-        <div>
-            
-        </div>
-    )
+  return (
+    <div><OrdersClient/></div>
+  )
 }
 
 export default page

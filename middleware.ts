@@ -31,16 +31,11 @@ export default clerkMiddleware(async (auth, req) => {
   // Protect admin routes with admin role
   if (isAdminRoute(req)) {
     const token = await authObj.getToken({ template: 'with-role' });
-    console.log('Token:', token);
     if (token) {
       const decoded = jwtDecode<RoleJWT>(token);
-      console.log('Decoded JWT:', decoded);
       const role = decoded?.publicMetadata?.role;
-      console.log('Role from JWT:', role);
       if (process.env.NODE_ENV === 'development') {
-        console.log('Decoded JWT:', decoded);
       }
-      console.log('Role from JWT:', role);
 
       if (role === 'admin') {
         return NextResponse.next();

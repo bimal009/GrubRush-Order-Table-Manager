@@ -23,7 +23,7 @@ import DeleteButton from "./DeleteButton"
 import Link from "next/link"
 import MarkAvailableButton from "./MarkAvailableButton"
 import ViewOrderButton from "./VeiwOrderButton"
-import MarkReservedButton from "./MarkReservedButton"
+import MarkAsPaidButton from "../../orderData/_components/MarkAsPaidButton"
 
 export type HotelTable = {
     _id?: string
@@ -33,7 +33,7 @@ export type HotelTable = {
     isAvailable: boolean
     isReserved: boolean
     isPaid: boolean
-    status: "idle" | "processing" | "completed"
+    status: 'pending' | 'preparing' | 'served' | 'cancelled';
     estimatedServeTime: string | null
     reservedBy: {
         name?: string;
@@ -127,15 +127,17 @@ export const columns: ColumnDef<HotelTable>[] = [
         header: "Order Status",
         cell: ({ row }) => {
             const status = row.getValue("status") as HotelTable["status"];
-            const colorMap: Record<HotelTable["status"], "default" | "blue" | "green"> = {
-                idle: "default",
-                processing: "blue",
-                completed: "green",
+            const colorMap: Record<HotelTable["status"], "default" | "blue" | "green" | "destructive"> = {
+                pending: "default",
+                preparing: "blue",
+                served: "green",
+                cancelled: "destructive",
             };
             const iconMap = {
-                idle: <Clock className="inline mr-1 w-4 h-4" />,
-                processing: <Loader2 className="inline mr-1 w-4 h-4 animate-spin" />,
-                completed: <CheckCircle2 className="inline mr-1 w-4 h-4" />,
+                pending: <Clock className="inline mr-1 w-4 h-4" />,
+                preparing: <Loader2 className="inline mr-1 w-4 h-4 animate-spin" />,
+                served: <CheckCircle2 className="inline mr-1 w-4 h-4" />,
+                cancelled: <Clock className="inline mr-1 w-4 h-4" />,
             };
 
             return (
@@ -143,28 +145,6 @@ export const columns: ColumnDef<HotelTable>[] = [
                     {iconMap[status]}
                     {status}
                 </Badge>
-            );
-        },
-    },
-    {
-        accessorKey: "estimatedServeTime",
-        header: "ETA",
-        cell: ({ row }) => {
-            const eta = row.getValue("estimatedServeTime") as string | null;
-
-            if (!eta) {
-                return <span className="text-muted-foreground">N/A</span>;
-            }
-
-            const date = new Date(eta);
-            const isValid = !isNaN(date.getTime());
-
-            return (
-                <span>
-                    {isValid
-                        ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                        : <span className="text-muted-foreground">Invalid Date</span>}
-                </span>
             );
         },
     },

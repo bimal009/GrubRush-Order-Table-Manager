@@ -21,8 +21,8 @@ export type HotelTable = {
   isAvailable: boolean;
   isReserved: boolean;
   isPaid: boolean;
-  status: 'idle' | 'processing' | 'completed';
-  currentOrder: string;
+  status: 'pending' | 'preparing' | 'served' | 'cancelled';
+  currentOrders: string[];
   estimatedServeTime?: string | null;
   reservedBy: {
     name?: string;
@@ -38,8 +38,8 @@ export type CreateTableParams = {
   isAvailable?: boolean;
   isReserved?: boolean;
   isPaid?: boolean;
-  status?: 'idle' | 'processing' | 'completed';
-  currentOrder?: string;
+  status?: 'pending' | 'preparing' | 'served' | 'cancelled';
+  currentOrders?: string[];
   estimatedServeTime?: string | null;
   reservedBy?: {
     name?: string;
@@ -56,7 +56,7 @@ export type SerializedHotelTable = {
   isAvailable: boolean;
   isReserved: boolean;
   isPaid: boolean;
-  status: 'idle' | 'processing' | 'completed';
+  status: 'pending' | 'preparing' | 'served' | 'cancelled';
   estimatedServeTime: string | null;
   reservedBy: {
     name?: string;
@@ -75,8 +75,8 @@ export type TableWithOrder = {
   isAvailable: boolean;
   isReserved: boolean;
   isPaid: boolean;
-  status: 'idle' | 'processing' | 'completed';
-  currentOrder: IOrder | null;
+  status: 'pending' | 'preparing' | 'served' | 'cancelled';
+  currentOrders: IOrder[] | null;
   reservedBy: {
     name?: string;
     email?: string;

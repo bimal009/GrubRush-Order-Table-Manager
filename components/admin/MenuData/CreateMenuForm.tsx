@@ -91,7 +91,6 @@ function CreateMenuItemForm({ trigger, onSuccess }: CreateMenuItemFormProps) {
     const onSubmit = (values: MenuItemFormData) => {
         createMenuItem(values, {
             onSuccess: (data) => {
-                console.log("Menu item created:", data)
                 form.reset()
                 if (onSuccess) onSuccess()
                 setIsOpen(false)

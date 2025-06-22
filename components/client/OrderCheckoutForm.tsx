@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Trash2, Plus, Minus } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState, useMemo } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -42,7 +42,7 @@ import { useAuth } from "@clerk/nextjs"
 // Form validation schema
 const orderSchema = z.object({
     orderItems: z.array(z.object({
-        id: z.string(),
+        menuItem: z.string(),
         name: z.string(),
         price: z.number(),
         quantity: z.number().min(1),
@@ -63,18 +63,41 @@ type OrderFormData = z.infer<typeof orderSchema>
 interface OrderCheckoutFormProps {
     trigger?: React.ReactNode
     onSuccess?: () => void
-    initialItems?: Array<{id: string, name: string, price: number, quantity: number}>
+    initialItems?: Array<{menuItem: string, name: string, price: number, quantity: number}>
     tableId?: string
 }
 
 function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: OrderCheckoutFormProps) {
     const { orders, addItem, removeItem, clearOrder } = useOrderStore()
-    const {mutate:createOrder} = useCreateOrder()
-    const {data:tables} = useGetTables()
-    const user=useAuth()
-    console.log("user",user)
-    const table=tables?.find((table)=>table._id===tableId)
-    const isPending = false // Mock loading state
+    const [isOpen, setIsOpen] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false) // Separate state for submit status
+    
+    const {mutate: createOrder} = useCreateOrder(() => {
+        setIsSubmitting(false) // Reset submitting state
+        // Clear the order store after successful submission
+        clearOrder()
+        // Reset form immediately
+        form.reset({
+            orderItems: [],
+            table: tableId || "",
+            buyer: user.userId || "",
+            totalAmount: "",
+            quantity: 0,
+        })
+        setIsOpen(false)
+        if (onSuccess) onSuccess()
+    }, () => {
+        setIsSubmitting(false) // Reset submitting state on error
+    })
+    
+    const {data: tables} = useGetTables()
+    const user = useAuth()
+    console.log("user", user)
+    
+    const table = useMemo(() => 
+        tables?.find((table) => table._id === tableId), 
+        [tables, tableId]
+    )
 
     const form = useForm<OrderFormData>({
         resolver: zodResolver(orderSchema),
@@ -103,7 +126,8 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
         form.setValue(`orderItems.${index}.quantity`, newQuantity)
     }
 
-    const calculateTotal = () => {
+    // Memoize calculations to prevent unnecessary re-renders
+    const totals = useMemo(() => {
         const items = watchedItems || []
         const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
         const tax = subtotal * 0.1 // 10% tax
@@ -112,29 +136,42 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
             tax: tax.toFixed(2),
             total: (subtotal + tax).toFixed(2)
         }
-    }
-
-    const totals = calculateTotal()
+    }, [watchedItems])
 
     const onSubmit = (values: OrderFormData) => {
+        setIsSubmitting(true) // Set submitting state
+        
         const totalAmount = totals.total
         const totalQuantity = watchedItems?.reduce((sum, item) => sum + item.quantity, 0) || 0
         
+        // Create a completely isolated order data object
+        const cleanOrderItems = (values.orderItems || []).map(item => ({
+            menuItem: String(item.menuItem),
+            name: String(item.name),
+            price: Number(item.price),
+            quantity: Number(item.quantity),
+            specialInstructions: String(item.specialInstructions || ""),
+            estimatedServeTime: Number(item.estimatedServeTime || 0)
+        }))
+        
         const orderData = {
-            ...values,
-            totalAmount,
-            quantity: totalQuantity,
+            orderItems: cleanOrderItems,
+            table: String(values.table),
+            buyer: String(values.buyer),
+            totalAmount: String(totalAmount),
+            quantity: Number(totalQuantity),
         }
         
-        console.log("Form values:", orderData)
-        createOrder(orderData)
-        // Clear the order store after successful submission
-        clearOrder()
+        console.log("Submitting order with", orderData.orderItems?.length || 0, "items")
+        console.log("Order data structure:", {
+            orderItemsCount: orderData.orderItems?.length,
+            table: orderData.table,
+            buyer: orderData.buyer,
+            totalAmount: orderData.totalAmount,
+            quantity: orderData.quantity
+        })
         
-        setTimeout(() => {
-            form.reset()
-            if (onSuccess) onSuccess()
-        }, 1000)
+        createOrder(orderData)
     }
 
     useEffect(() => {
@@ -150,11 +187,17 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
             totalAmount: "",
             quantity: 0,
         })
-    }, [orders, form, tableId, user.userId])
+    }, [orders, tableId, user.userId]) // Removed 'form' from dependencies
 
     return (
-        <Dialog>
-            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            {trigger && (
+                <div onClick={() => setIsOpen(true)}>
+                    <DialogTrigger asChild>
+                        {trigger}
+                    </DialogTrigger>
+                </div>
+            )}
             
             <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
@@ -192,6 +235,7 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => updateQuantity(index, -1)}
+                                                        disabled={isSubmitting}
                                                     >
                                                         <Minus className="w-4 h-4" />
                                                     </Button>
@@ -201,6 +245,7 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => updateQuantity(index, 1)}
+                                                        disabled={isSubmitting}
                                                     >
                                                         <Plus className="w-4 h-4" />
                                                     </Button>
@@ -216,6 +261,7 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => removeItemFromForm(index)}
+                                                    disabled={isSubmitting}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
@@ -232,6 +278,7 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
                                                         <Textarea
                                                             placeholder="No onions, extra sauce, etc..."
                                                             className="resize-none"
+                                                            disabled={isSubmitting}
                                                             {...field}
                                                         />
                                                     </FormControl>
@@ -295,11 +342,20 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
                         </div>
 
                         <div className="flex justify-end space-x-2 pt-4">
-                            <Button type="button" variant="outline">
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => setIsOpen(false)}
+                                disabled={isSubmitting}
+                            >
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={isPending} className="bg-green-600 hover:bg-green-700">
-                                {isPending ? "Processing..." : "Place Order"}
+                            <Button 
+                                type="submit" 
+                                disabled={isSubmitting || !watchedItems?.length} 
+                                className="bg-green-600 hover:bg-green-700"
+                            >
+                                {isSubmitting ? "Processing..." : "Place Order"}
                             </Button>
                         </div>
                     </form>
