@@ -71,3 +71,37 @@ export interface MenuItem {
 export type CreateMenuParams = Omit<MenuItem, 'category' | '_id' | 'createdAt' | 'updatedAt'> & {
     category: string;
 };
+
+// Order related types
+export interface OrderItem {
+  id: string | number
+  name: string
+  quantity: number
+  price: number
+}
+
+export interface Order {
+  _id: string;
+  id: string
+  restaurant: string
+  date: string
+  time: string
+  status: 'pending' | 'preparing' | 'served' | 'cancelled' | 'completed'
+  items: OrderItem[]
+  total: number
+  estimatedArrival?: string
+  cancelReason?: string
+  createdAt: string
+  table: TableInfo | null;
+}
+
+export interface TableInfo {
+  _id: string;
+  tableNumber: number;
+  capacity: number;
+  location: 'indoor' | 'outdoor';
+  isAvailable: boolean;
+  isReserved: boolean;
+  isPaid: boolean;
+  status: string;
+}

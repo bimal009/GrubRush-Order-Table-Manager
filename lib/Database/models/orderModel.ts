@@ -1,5 +1,15 @@
 import { Schema, model, models, Document, Types } from 'mongoose';
 
+export interface IOrderItem extends Document {
+  _id: Types.ObjectId;
+  menuItem: Types.ObjectId; // Reference to MenuItem
+  name: string;
+  price: number;
+  quantity: number;
+  specialInstructions?: string;
+  estimatedServeTime?: number;
+}
+
 export interface IOrder extends Document {
   createdAt: Date;
   totalAmount: string;
@@ -9,18 +19,11 @@ export interface IOrder extends Document {
   quantity: number;
   status: 'pending' | 'preparing' | 'served' | 'cancelled';
   isPaid: boolean;
-  orderItems: Array<{
-    menuItem: Types.ObjectId; // Reference to MenuItem
-    name: string;
-    price: number;
-    quantity: number;
-    specialInstructions?: string;
-    estimatedServeTime?: number;
-  }>;
+  orderItems: IOrderItem[];
 }
 
 // Optional client-side type
-export type IOrderItem = {
+export type ClientOrderItem = {
   _id: string;
   totalAmount: string;
   createdAt: Date;
@@ -30,6 +33,35 @@ export type IOrderItem = {
   estimatedServeTime?: number | null;
   quantity: number;
 };
+
+const OrderItemSchema = new Schema<IOrderItem>({
+  menuItem: {
+    type: Schema.Types.ObjectId,
+    ref: 'MenuItem',
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    min: 1,
+  },
+  specialInstructions: {
+    type: String,
+    default: "",
+  },
+  estimatedServeTime: {
+    type: Number,
+    default: null,
+  },
+});
 
 const OrderSchema = new Schema<IOrder>({
   createdAt: {
@@ -67,35 +99,7 @@ const OrderSchema = new Schema<IOrder>({
     type: Boolean,
     default: false,
   },
-  orderItems: [{
-    menuItem: {
-      type: Schema.Types.ObjectId,
-      ref: 'MenuItem',
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
-    specialInstructions: {
-      type: String,
-      default: "",
-    },
-    estimatedServeTime: {
-      type: Number,
-      default: null,
-    },
-    
-  }],
+  orderItems: [OrderItemSchema],
 });
 
 // Force model recompilation by deleting existing model

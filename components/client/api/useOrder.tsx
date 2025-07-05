@@ -1,7 +1,7 @@
 "use client"
 
-import { createOrder, getOrderById, GetOrders } from "@/lib/actions/order.actions"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { createOrder, getOrderById, GetOrders, updateOrderStatus } from "@/lib/actions/order.actions"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useCreateOrder = (onSuccess?: () => void, onError?: () => void) => {
     return useMutation({
@@ -35,6 +35,16 @@ export const useGetOrderById = (orderId: string) => {
         queryFn: () => getOrderById(orderId)
     })
 
+}
+
+export const useUpdateOrderStatus = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: ({ orderId, status }: { orderId: string, status: string }) => updateOrderStatus(orderId, status),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['orders'] })
+        }
+    })
 }
 
 

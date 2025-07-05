@@ -4,11 +4,13 @@ import React from 'react'
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <main className=' px-4 md:px-8 lg:px-16 mx-auto'>
+        <div className="flex flex-col min-h-screen">
             <Header />
-            {children}
+            <main className="flex-grow">
+                {children}
+            </main>
             <Footer />
-        </main>
+        </div>
     )
 }
 

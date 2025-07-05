@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { Trash2, Plus, Minus } from "lucide-react"
+import { Trash2, Plus, Minus, ShoppingCart } from "lucide-react"
 import { useEffect, useState, useMemo } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -23,7 +23,6 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import {
     Select,
     SelectContent,
@@ -35,7 +34,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { useOrderStore } from "@/lib/stores/orderStore"
 import { useGetTables } from "../admin/api/useTable"
-import { useGetMenu } from "../admin/api/useMenu"
 import { useCreateOrder } from "./api/useOrder"
 import { useAuth } from "@clerk/nextjs"
 
@@ -68,15 +66,13 @@ interface OrderCheckoutFormProps {
 }
 
 function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: OrderCheckoutFormProps) {
-    const { orders, addItem, removeItem, clearOrder } = useOrderStore()
+    const { orders, removeItem, clearOrder } = useOrderStore()
     const [isOpen, setIsOpen] = useState(false)
-    const [isSubmitting, setIsSubmitting] = useState(false) // Separate state for submit status
+    const [isSubmitting, setIsSubmitting] = useState(false)
     
     const {mutate: createOrder} = useCreateOrder(() => {
-        setIsSubmitting(false) // Reset submitting state
-        // Clear the order store after successful submission
+        setIsSubmitting(false)
         clearOrder()
-        // Reset form immediately
         form.reset({
             orderItems: [],
             table: tableId || "",
@@ -87,12 +83,11 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
         setIsOpen(false)
         if (onSuccess) onSuccess()
     }, () => {
-        setIsSubmitting(false) // Reset submitting state on error
+        setIsSubmitting(false)
     })
     
     const {data: tables} = useGetTables()
     const user = useAuth()
-    console.log("user", user)
     
     const table = useMemo(() => 
         tables?.find((table) => table._id === tableId), 
@@ -117,7 +112,10 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
 
     const removeItemFromForm = (index: number) => {
         const currentItems = form.getValues("orderItems") || []
+        const itemToRemove = currentItems[index]
         form.setValue("orderItems", currentItems.filter((_, i) => i !== index))
+        // Also remove from store
+        removeItem(itemToRemove.menuItem)
     }
 
     const updateQuantity = (index: number, change: number) => {
@@ -139,12 +137,11 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
     }, [watchedItems])
 
     const onSubmit = (values: OrderFormData) => {
-        setIsSubmitting(true) // Set submitting state
+        setIsSubmitting(true)
         
         const totalAmount = totals.total
         const totalQuantity = watchedItems?.reduce((sum, item) => sum + item.quantity, 0) || 0
         
-        // Create a completely isolated order data object
         const cleanOrderItems = (values.orderItems || []).map(item => ({
             menuItem: String(item.menuItem),
             name: String(item.name),
@@ -187,7 +184,7 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
             totalAmount: "",
             quantity: 0,
         })
-    }, [orders, tableId, user.userId]) // Removed 'form' from dependencies
+    }, [orders, tableId, user.userId])
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -199,11 +196,11 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
                 </div>
             )}
             
-            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Order Checkout</DialogTitle>
                     <DialogDescription>
-                        Review your selected items and complete your order.
+                        Review your order and complete checkout.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -213,6 +210,12 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-lg font-medium">Order Items</h3>
+                                <div className="flex items-center gap-2">
+                                    <ShoppingCart className="w-4 h-4" />
+                                    <span className="text-sm text-gray-600">
+                                        {watchedItems?.reduce((sum, item) => sum + item.quantity, 0) || 0} items
+                                    </span>
+                                </div>
                             </div>
                             
                             {(!watchedItems || watchedItems.length === 0) ? (
@@ -295,29 +298,65 @@ function OrderCheckoutForm({ trigger, onSuccess, initialItems = [], tableId }: O
                         <div className="space-y-4">
                             <h3 className="text-lg font-medium">Table Information</h3>
                             
-                            <FormField
-                                control={form.control}
-                                name="table"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Table</FormLabel>
-                                        <div className="text-sm text-gray-500">
-                                            Table No: {table?.tableNumber}
-                                        </div>
-                                        <input type="hidden" {...field} value={table?._id || ""} />
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            {tableId ? (
+                                <FormField
+                                    control={form.control}
+                                    name="table"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Table</FormLabel>
+                                            <div className="text-sm text-gray-500">
+                                                Table No: {table?.tableNumber}
+                                            </div>
+                                            <input type="hidden" {...field} value={table?._id || ""} />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            ) : (
+                                <FormField
+                                    control={form.control}
+                                    name="table"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Table</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a table" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {tables?.filter(t => t.isAvailable).map(t => (
+                                                        <SelectItem key={t._id} value={t._id}>
+                                                            Table {t.tableNumber} - {t.capacity} seats
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
                         </div>
 
                         {/* Estimated Serve Time Display */}
                         <div className="space-y-4">
                             <h3 className="text-lg font-medium">Estimated Serve Time</h3>
                             <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded-lg">
-                                {(watchedItems?.length || 0) > 1 
-                                    ? "Order will be served together and soon" 
-                                    : `Estimated serve time: ${watchedItems?.[0]?.estimatedServeTime || 0} minutes`}
+                                {(() => {
+                                    const items = watchedItems || []
+                                    if (items.length === 0) {
+                                        return "No items selected"
+                                    } else if (items.length === 1) {
+                                        return `Estimated serve time: ${items[0]?.estimatedServeTime || 0} minutes`
+                                    } else {
+                                        const totalTime = items.reduce((sum, item) => sum + (item.estimatedServeTime || 0), 0)
+                                        const averageTime = Math.round(totalTime / items.length)
+                                        return `Average estimated serve time: ${averageTime} minutes`
+                                    }
+                                })()}
                             </div>
                         </div>
 

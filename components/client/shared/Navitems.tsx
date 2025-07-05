@@ -14,7 +14,14 @@ const Navigations = [
         label: 'Reserve Table',
         href: '/reserve',
     },
-    
+    {
+        label: 'My Reservations',
+        href: '/my-reservations',
+    },
+    {
+        label: 'My Orders',
+        href: '/orders',
+    },
     {
         label: 'About Us',
         href: '/about',

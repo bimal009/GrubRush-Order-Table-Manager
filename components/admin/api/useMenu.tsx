@@ -1,19 +1,20 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import {  getMenu, createMenuItem, deleteMenuItem } from "@/lib/actions/menu.actions"
+import {  getMenu, createMenuItem, deleteMenuItem, updateMenuItem, toggleMenuItemAvailability } from "@/lib/actions/menu.actions"
 import { MenuItem, CreateMenuParams } from "@/types"
 import { toast } from "sonner"
 
-export const useGetMenu = (query?: string) => {
-    return useQuery<MenuItem[]>({
-        queryKey: ["menu", query],
+export const useGetMenu = (query?: string, category?: string, page?: number, limit?: number) => {
+    return useQuery<{ items: MenuItem[]; pagination: any }>({
+        queryKey: ["menu", query, category, page, limit],
         queryFn: async () => {
-            const data = await getMenu(query)
-            if (data?.error) {
-                throw new Error(data.error)
+            const response = await getMenu(query, category, page, limit)
+            if (response?.error) {
+                throw new Error(response.error)
+                
             }
-            return data?.data || []
+            return response?.data || { items: [], pagination: {} }
         },
     })
 }
@@ -55,6 +56,49 @@ export const useDeleteMenu = () => {
         },
         onError: (error) => {
             toast.error(error.message || "Failed to delete menu item.")
+        },
+    })
+}
+
+export const useUpdateMenu = () => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: async ({ id, menuItem }: { id: string; menuItem: CreateMenuParams }) => {
+            const data = await updateMenuItem(id, menuItem)
+            if (data?.error) {
+                throw new Error(data.error)
+            }
+            return data?.data
+        },
+        onSuccess: () => {
+            toast.success("Menu item updated successfully!")
+            queryClient.invalidateQueries({ queryKey: ["menu"] })
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to update menu item.")
+        },
+    })
+}
+
+export const useToggleAvailability = () => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: async ({ id, isAvailable }: { id: string; isAvailable: boolean }) => {
+            const data = await toggleMenuItemAvailability(id, isAvailable)
+            if (data?.error) {
+                throw new Error(data.error)
+            }
+            return data?.data
+        },
+        onSuccess: (_, { isAvailable }) => {
+            const status = isAvailable ? "available" : "unavailable"
+            toast.success(`Menu item marked as ${status}!`)
+            queryClient.invalidateQueries({ queryKey: ["menu"] })
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to update availability.")
         },
     })
 }

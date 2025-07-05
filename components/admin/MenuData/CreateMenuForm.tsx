@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -33,8 +33,9 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import CloudinaryUploader from "@/components/CloudinaryUploader"
-import { useCreateMenu } from "../api/useMenu"
+import { useCreateMenu, useUpdateMenu } from "../api/useMenu"
 import { useGetCategories } from "../api/useCategories"
+import { MenuItem } from "@/types"
 
 // Form validation schema
 const menuItemSchema = z.object({
@@ -49,21 +50,20 @@ const menuItemSchema = z.object({
 
 type MenuItemFormData = z.infer<typeof menuItemSchema>
 
-// Mock data for categories - replace with your actual data fetchin
-
 interface CreateMenuItemFormProps {
     trigger?: React.ReactNode
     onSuccess?: () => void
-    // Add your API hook here
-    // useCreateMenuItem?: () => { mutate: Function, isPending: boolean }
+    menuItem?: MenuItem // For edit mode
 }
 
-function CreateMenuItemForm({ trigger, onSuccess }: CreateMenuItemFormProps) {
+function CreateMenuItemForm({ trigger, onSuccess, menuItem }: CreateMenuItemFormProps) {
     const [isOpen, setIsOpen] = useState(false)
     const { mutate: createMenuItem, isPending: isCreating } = useCreateMenu()
+    const { mutate: updateMenuItem, isPending: isUpdating } = useUpdateMenu()
     const { data: categories } = useGetCategories()
-    // Replace with your actual API hook
-    // const { mutate: createMenuItem, isPending } = useCreateMenuItem()
+    
+    const isEditMode = !!menuItem
+    const isPending = isCreating || isUpdating
 
     const form = useForm<MenuItemFormData>({
         resolver: zodResolver(menuItemSchema),
@@ -78,24 +78,60 @@ function CreateMenuItemForm({ trigger, onSuccess }: CreateMenuItemFormProps) {
         },
     })
 
+    // Reset form when menuItem changes (for edit mode)
+    useEffect(() => {
+        if (menuItem) {
+            form.reset({
+                name: menuItem.name,
+                description: menuItem.description,
+                price: menuItem.price,
+                category: menuItem.category._id,
+                image: menuItem.image || "",
+                isAvailable: menuItem.isAvailable,
+                preparationTime: menuItem.preparationTime,
+            })
+        } else {
+            form.reset({
+                name: "",
+                description: "",
+                price: 0,
+                category: "",
+                image: "",
+                isAvailable: true,
+                preparationTime: undefined,
+            })
+        }
+    }, [menuItem, form])
+
     const handleImageUpload = (secureUrl: string) => {
         form.setValue("image", secureUrl);
     };
 
     const handleImageError = (error: string) => {
         console.error("Image upload error:", error);
-        // You might want to show this error to the user
-        // form.setError("image", { message: error });
     };
 
     const onSubmit = (values: MenuItemFormData) => {
-        createMenuItem(values, {
-            onSuccess: (data) => {
-                form.reset()
-                if (onSuccess) onSuccess()
-                setIsOpen(false)
-            },
-        })
+        if (isEditMode && menuItem) {
+            updateMenuItem(
+                { id: menuItem._id, menuItem: values },
+                {
+                    onSuccess: (data) => {
+                        form.reset()
+                        if (onSuccess) onSuccess()
+                        setIsOpen(false)
+                    },
+                }
+            )
+        } else {
+            createMenuItem(values, {
+                onSuccess: (data) => {
+                    form.reset()
+                    if (onSuccess) onSuccess()
+                    setIsOpen(false)
+                },
+            })
+        }
     }
 
     return (
@@ -104,9 +140,12 @@ function CreateMenuItemForm({ trigger, onSuccess }: CreateMenuItemFormProps) {
             
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Add New Menu Item</DialogTitle>
+                    <DialogTitle>{isEditMode ? "Edit Menu Item" : "Add New Menu Item"}</DialogTitle>
                     <DialogDescription>
-                        Fill in the details below to add a new item to your menu.
+                        {isEditMode 
+                            ? "Update the details below to modify the menu item."
+                            : "Fill in the details below to add a new item to your menu."
+                        }
                     </DialogDescription>
                 </DialogHeader>
 
@@ -208,8 +247,8 @@ function CreateMenuItemForm({ trigger, onSuccess }: CreateMenuItemFormProps) {
                                             <CloudinaryUploader
                                                 onUploadSuccess={handleImageUpload}
                                                 onUploadError={handleImageError}
-                                                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || ''} // Make sure this preset exists in your Cloudinary dashboard
-                                                cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || ''} // Fixed environment variable name
+                                                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || ''}
+                                                cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || ''}
                                                 folder={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || ''}
                                                 currentImageUrl={field.value}
                                                 showPreview={true}
@@ -278,8 +317,11 @@ function CreateMenuItemForm({ trigger, onSuccess }: CreateMenuItemFormProps) {
                             >
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={isCreating}>
-                                {isCreating ? "Creating..." : "Add Menu Item"}
+                            <Button type="submit" disabled={isPending}>
+                                {isPending 
+                                    ? (isEditMode ? "Updating..." : "Creating...") 
+                                    : (isEditMode ? "Update Menu Item" : "Add Menu Item")
+                                }
                             </Button>
                         </div>
                     </form>

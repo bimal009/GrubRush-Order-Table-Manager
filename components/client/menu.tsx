@@ -1,6 +1,7 @@
 "use client";
 import Search from '@/components/client/shared/Search';
-import React, { useEffect, } from 'react';
+import CategoryFilter from '@/components/client/shared/CategoryFilter';
+import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import MenuCard from '@/components/client/shared/MenuCard';
 import {
@@ -18,85 +19,59 @@ import { MenuItem } from '@/types';
 const Menu = () => {
     const searchParams = useSearchParams();
     const query = searchParams.get('search') || '';
-    const { data, isLoading, error } = useGetMenu(query);
-    console.log("menu data",data)
-    // Pagination state from URL with fallback for SSR
+    const category = searchParams.get('category') || '';
+    
     const [currentPageState, setCurrentPage] = useQueryState('page', {
         defaultValue: '1',
         parse: (value) => value ?? '1',
     });
+    
+    const currentPage = parseInt(currentPageState || '1');
+    const itemsPerPage = 6;
+    
+    const { data, isLoading, error } = useGetMenu(query, category, currentPage, itemsPerPage);
+    
+    const menuItems = data?.items || [];
+    const totalPages = data?.pagination?.totalPages || 1;
 
-    // Ensure we have a valid currentPage even during SSR
-    const currentPage = currentPageState || '1';
-
-    const itemsPerPage = 6; // 3 items per row × 2 rows
-
-    // Calculate pagination values
-    const totalItems = data?.length || 0;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-    // Reset to page 1 when search changes
-    useEffect(() => {
-        if (query) {
-            setCurrentPage('1');
-        }
-    }, [query, setCurrentPage]);
-
-    // Get current page data
-    const getCurrentPageData = () => {
-        const pageNum = parseInt(currentPage) || 1;
-        const startIndex = (pageNum - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        return data?.slice(startIndex, endIndex) || [];
-    };
-
-    // Handle page change
     const handlePageChange = (page: number) => {
-        setCurrentPage(page.toString());
-        // Scroll to top when changing pages
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (page > 0 && page <= totalPages) {
+            setCurrentPage(page.toString());
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
-    // Generate page numbers for pagination
     const getPageNumbers = () => {
         const pageNumbers = [];
-        const maxVisiblePages = 5; // Maximum number of page numbers to show
-        const currentPageNum = parseInt(currentPage) || 1;
+        const maxVisiblePages = 5;
+        const currentPageNum = currentPage;
 
         if (totalPages <= maxVisiblePages) {
-            // Show all pages if total is less than max visible
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
             }
         } else {
-            // Always include first page
             pageNumbers.push(1);
 
-            // Calculate start and end of visible page range
             let startPage = Math.max(2, currentPageNum - Math.floor(maxVisiblePages / 2));
             const endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 3);
 
-            // Adjust start if end is too close to total
             if (endPage === totalPages - 1) {
                 startPage = Math.max(2, endPage - (maxVisiblePages - 3));
             }
 
-            // Add ellipsis after first page if needed
             if (startPage > 2) {
                 pageNumbers.push('ellipsis-start');
             }
 
-            // Add pages in the middle
             for (let i = startPage; i <= endPage; i++) {
                 pageNumbers.push(i);
             }
 
-            // Add ellipsis before last page if needed
             if (endPage < totalPages - 1) {
                 pageNumbers.push('ellipsis-end');
             }
 
-            // Always include last page
             if (totalPages > 1) {
                 pageNumbers.push(totalPages);
             }
@@ -106,10 +81,17 @@ const Menu = () => {
     };
 
     return (
-        <main className="container mx-auto px-4 py-8 h-screen">
+        <section className="container mx-auto px-4 py-8 relative">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold mb-6 text-center text-primary">Our Menu</h1>
-                <Search />
+                <div className="flex flex-col sm:flex-row gap-4 items-center justify-center max-w-4xl mx-auto">
+                    <div className="w-full sm:w-1/2">
+                        <Search />
+                    </div>
+                    <div className="w-full sm:w-1/2">
+                        <CategoryFilter />
+                    </div>
+                </div>
             </div>
 
             {isLoading && (
@@ -124,23 +106,24 @@ const Menu = () => {
                 </div>
             )}
 
-            {!isLoading && !error && data?.length === 0 && (
+            {!isLoading && !error && menuItems.length === 0 && (
                 <div className="text-center py-12">
-                    <p className="text-lg">No meals found. Try a different search.</p>
+                    <p className="text-lg">No meals found. Try a different search or category filter.</p>
                 </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {getCurrentPageData().map((meal: MenuItem) => (
+                {menuItems.map((meal: MenuItem) => (
                     <MenuCard key={meal._id} item={meal} type="menu" />
                 ))}
             </div>
 
-            {!isLoading && !error && data && data.length > 0 && (
+        
+            {!isLoading && !error && menuItems.length > 0 && (
                 <div className="mt-10">
                     <Pagination>
                         <PaginationContent>
-                            {parseInt(currentPage) > 1 && (
+                            {currentPage > 1 && (
                                 <PaginationItem>
                                     <PaginationPrevious
                                         href="#"
@@ -148,12 +131,12 @@ const Menu = () => {
                                         tabIndex={0}
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            handlePageChange(parseInt(currentPage) - 1);
+                                            handlePageChange(currentPage - 1);
                                         }}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' || e.key === ' ') {
                                                 e.preventDefault();
-                                                handlePageChange(parseInt(currentPage) - 1);
+                                                handlePageChange(currentPage - 1);
                                             }
                                         }}
                                     />
@@ -179,7 +162,7 @@ const Menu = () => {
                                                     handlePageChange(page as number);
                                                 }
                                             }}
-                                            isActive={page === parseInt(currentPage)}
+                                            isActive={page === currentPage}
                                         >
                                             {page}
                                         </PaginationLink>
@@ -187,7 +170,7 @@ const Menu = () => {
                                 </PaginationItem>
                             ))}
 
-                            {parseInt(currentPage) < totalPages && (
+                            {currentPage < totalPages && (
                                 <PaginationItem>
                                     <PaginationNext
                                         href="#"
@@ -195,12 +178,12 @@ const Menu = () => {
                                         tabIndex={0}
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            handlePageChange(parseInt(currentPage) + 1);
+                                            handlePageChange(currentPage + 1);
                                         }}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' || e.key === ' ') {
                                                 e.preventDefault();
-                                                handlePageChange(parseInt(currentPage) + 1);
+                                                handlePageChange(currentPage + 1);
                                             }
                                         }}
                                     />
@@ -210,7 +193,7 @@ const Menu = () => {
                     </Pagination>
                 </div>
             )}
-        </main>
+        </section>
     );
 };
 

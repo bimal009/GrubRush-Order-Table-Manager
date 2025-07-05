@@ -1,14 +1,60 @@
 "use client"
-import { columns } from '@/components/admin/orderData/_components/columns'
+import { GroupedOrder, columns } from '@/components/admin/orderData/_components/columns'
 import DataTable from '@/components/admin/orderData/DataTable'
 import { Loader2, Table2 } from 'lucide-react'
 import React from 'react'
 import { useGetOrders } from '@/components/admin/api/useOrders'
+import { SerializedOrder } from '@/components/admin/orderData/_components/columns'
 
 
 
 const OrdersClient = () => {
-    const { data: orders, isLoading } = useGetOrders()
+    const { data: ordersData, isLoading } = useGetOrders()
+
+    const groupedOrders = React.useMemo(() => {
+        if (!ordersData?.data?.orders) return [];
+
+        const orders = ordersData.data.orders.filter(Boolean) as SerializedOrder[];
+
+        const grouped = orders.reduce((acc, order) => {
+            if (!order.table) {
+                return acc;
+            }
+            const tableId = order.table._id;
+
+            if (!acc[tableId]) {
+                acc[tableId] = {
+                    _id: tableId,
+                    table: order.table,
+                    orders: [],
+                    totalOrders: 0,
+                    totalAmount: 0,
+                    status: 'completed',
+                    isPaid: true
+                };
+            }
+            
+            acc[tableId].orders.push(order);
+            acc[tableId].totalOrders += 1;
+            acc[tableId].totalAmount += parseFloat(order.totalAmount) || 0;
+            if(!order.isPaid){
+                acc[tableId].isPaid = false;
+            }
+
+            if (order.status !== 'completed' && acc[tableId].status === 'completed') {
+                acc[tableId].status = order.status;
+            } else if (order.status === 'preparing' && acc[tableId].status !== 'pending') {
+                 acc[tableId].status = 'preparing';
+            } else if (order.status === 'pending') {
+                acc[tableId].status = 'pending';
+            }
+
+            return acc;
+        }, {} as Record<string, GroupedOrder>);
+
+        return Object.values(grouped);
+    }, [ordersData]);
+
 
     if (isLoading) {
         return (
@@ -38,7 +84,7 @@ const OrdersClient = () => {
                 </div>
                 {/* Table Section */}
                 <div className="rounded-2xl border bg-card shadow-lg p-0 sm:p-2 w-full overflow-x-visible">
-                    <DataTable type="orders" columns={columns} data={orders?.data ?? []} />
+                    <DataTable type="grouped-orders" columns={columns} data={groupedOrders} />
                 </div>
             </div>
         </div>

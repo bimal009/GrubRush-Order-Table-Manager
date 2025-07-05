@@ -52,17 +52,15 @@ const Footer = () => {
                         <Link href="/" className="flex items-center gap-2 mb-4">
                             <Image
                                 src="/logo.svg"
-                                alt="Buntly logo"
+                                alt="GrubRush logo"
                                 width={32}
                                 height={32}
                                 className="h-8 w-8 object-contain"
                             />
-                            <p className="text-xl font-bold">Buntly</p>
+                            <p className="text-xl font-bold">GrubRush</p>
                         </Link>
                         <p className="text-sm text-muted-foreground mb-6 max-w-md">
-                            Buntly helps you create and manage events with ease.
-                            Connect with attendees, manage registrations, and create
-                            memorable experiences all in one place.
+                            GrubRush offers a diverse menu with delicious meals. Order your favorite food online or reserve a table for a great dining experience.
                         </p>
                         {/* Social links */}
                         <div className="flex gap-4">
@@ -104,7 +102,7 @@ const Footer = () => {
                 {/* Bottom section with copyright */}
                 <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-sm text-muted-foreground order-2 md:order-1">
-                        &copy; {currentYear} Buntly. All rights reserved.
+                        &copy; {currentYear} GrubRush. All rights reserved.
                     </p>
                     <div className="flex gap-6 order-1 md:order-2">
                         <Link href="/terms" className="text-xs text-muted-foreground hover:text-foreground transition-colors">

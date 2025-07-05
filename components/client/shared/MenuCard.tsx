@@ -10,9 +10,10 @@ import { useDebounce } from "@/lib/hooks/useDebounce";
 type MenuCardProps = {
     item: MenuItem | SerializedHotelTable;
     type: "menu" | "table";
+    tableCardType?: "reserve" | "order" | "select"
 };
 
-const MenuCard = ({ item, type }: MenuCardProps) => {
+const MenuCard = ({ item, type, tableCardType = "reserve" }: MenuCardProps) => {
     if (type === "menu") {
         const meal = item as MenuItem;
         const addItem = useOrderStore((state) => state.addItem);
@@ -60,24 +61,44 @@ const MenuCard = ({ item, type }: MenuCardProps) => {
 
     if (type === "table") {
         const table = item as SerializedHotelTable;
+
+        let buttonText = 'Reserve Now';
+        if (tableCardType === 'order') {
+            buttonText = 'Order Now';
+        } else if (tableCardType === 'select') {
+            buttonText = 'Select Table'
+        }
+
+        let linkUrl: string;
+        if (tableCardType === "order") {
+          linkUrl = `/orders?tableId=${table._id}`;
+        } else if (tableCardType === "select") {
+          linkUrl = `/select-tables/${table._id}`;
+        } else { // reserve
+          linkUrl = `/reserve/${table._id}`;
+        }
+
         return (
-            <Link href={`/select-tables/${table._id}`}>
-                <div className="border rounded-lg shadow-md overflow-hidden flex flex-col mb-6 hover:shadow-lg transition-shadow duration-300 p-4">
-                    <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-xl font-bold truncate">Table {table.tableNumber}</h2>
-                        {table.isAvailable ? (
-                            <Badge className="bg-green-500 text-white">Available</Badge>
-                        ) : (
-                            <Badge variant="destructive">Not Available</Badge>
-                        )}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                        <p>Place: <span className="font-semibold">{table.location}</span></p>
-                        <p>Seats: <span className="font-semibold">{table.capacity}</span></p>
-                        <p>Status: <span className="font-semibold">{table.status}</span></p>
-                    </div>
+            <div className="border rounded-lg shadow-md overflow-hidden flex flex-col mb-6 hover:shadow-lg transition-shadow duration-300 p-4 h-full">
+                <div className="flex justify-between items-center mb-2">
+                    <h2 className="text-xl font-bold truncate">Table {table.tableNumber}</h2>
+                    {table.isAvailable ? (
+                        <Badge className="bg-green-500 text-white">Available</Badge>
+                    ) : (
+                        <Badge variant="destructive">Not Available</Badge>
+                    )}
                 </div>
-            </Link>
+                <div className="text-sm text-gray-600 flex-grow">
+                    <p>Place: <span className="font-semibold">{table.location}</span></p>
+                    <p>Seats: <span className="font-semibold">{table.capacity}</span></p>
+                    <p>Status: <span className="font-semibold">{table.status}</span></p>
+                </div>
+                <div className="mt-4">
+                    <Link href={linkUrl}>
+                        <Button className="w-full">{buttonText}</Button>
+                    </Link>
+                </div>
+            </div>
         );
     }
 

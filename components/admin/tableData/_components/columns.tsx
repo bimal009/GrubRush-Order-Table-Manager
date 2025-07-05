@@ -20,10 +20,8 @@ import {
 import { ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import DeleteButton from "./DeleteButton"
-import Link from "next/link"
 import MarkAvailableButton from "./MarkAvailableButton"
 import ViewOrderButton from "./VeiwOrderButton"
-import MarkAsPaidButton from "../../orderData/_components/MarkAsPaidButton"
 
 export type HotelTable = {
     _id?: string

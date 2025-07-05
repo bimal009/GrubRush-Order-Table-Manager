@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button"
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
-    type: "table" | "user" | "menu" | "reservations" | "orders"
+    type: "table" | "user" | "menu" | "reservations" | "orders" | "grouped-orders"
 }
 
 const DataTable = <TData, TValue>({
@@ -84,10 +84,15 @@ const DataTable = <TData, TValue>({
                     column: "_id",
                     placeholder: "Search order ID..."
                 }
+            case "grouped-orders":
+                return {
+                    column: "tableNumber",
+                    placeholder: "Search by table..."
+                }
             default:
                 return {
                     column: "name",
-                    placeholder: "Search..."
+                    placeholder: "Search by {type}..."
                 }
         }
     }
@@ -159,7 +164,7 @@ const DataTable = <TData, TValue>({
             {/* Pagination */}
             <div className="flex flex-col sm:flex-row items-center justify-between px-2 sm:px-4 py-4 gap-2">
                 <div className="text-sm text-muted-foreground">
-                    {table.getFilteredRowModel().rows.length} {type}(s) total
+                    {table.getFilteredRowModel().rows.length} {type === 'grouped-orders' ? 'tables' : type}(s) total
                 </div>
                 <div className="flex items-center space-x-2">
                     <Button

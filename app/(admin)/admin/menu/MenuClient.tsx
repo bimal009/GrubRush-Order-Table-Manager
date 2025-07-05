@@ -43,7 +43,7 @@ const MenuClient = () => {
 
                     {/* Table Section */}
                     <div className="rounded-2xl border bg-card shadow-lg p-0 sm:p-2 w-full overflow-x-visible">
-                        <DataTable columns={columns} data={menu || []} type="menu" />
+                        <DataTable columns={columns} data={menu?.items || []} type="menu" />
                     </div>
                 </div>
         </div>
